@@ -10,7 +10,12 @@ Then go to the virtualization folder and call sbt publish-local.
 
 Now navigate to the test-code folder and call the same instructions. 
 
-Next, within this folder you can call sbt test. This compiles and runs the test_code/src/test/scala/lms/scan_variants/scanVariants.scala file, which generates C code according to in-file parameters. These can be changed according to user demans.
+Next, within this folder you can call sbt test. This compiles and runs the test_code/src/test/scala/lms/scan_variants/scanVariants.scala file, which generates C code according to in-file parameters. These can be changed according to user demands.
 
 The resulting C code can be found in test_code/src/out.
 
+To run it you need a file consisting or a list of floats.
+
+To run the C program you pass as input, in the command line: fileName numTuples compareValue
+
+The compare value is the right hand value of the pre-defined predicate (equals, greater than, etc) for comparing with every tuple.
