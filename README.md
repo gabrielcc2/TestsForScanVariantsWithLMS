@@ -19,3 +19,8 @@ To run it you need a file consisting or a list of floats.
 To run the C program you pass as input, in the command line: fileName numTuples compareValue
 
 The compare value is the right hand value of the pre-defined predicate (equals, greater than, etc) for comparing with every tuple.
+
+Pending work:
+- Possible migration to another DSL api (https://github.com/epfldata/c-scala).
+- Remaining variants.
+- Tests.
