@@ -20,8 +20,9 @@ To run the C program you pass as input, in the command line: fileName numTuples 
 
 The compare value is the right hand value of the pre-defined predicate (equals, greater than, etc) for comparing with every tuple.
 
-Pending work:
+Upcoming work:
 - Possible migration to another DSL api (https://github.com/epfldata/c-scala).
-- Completing remaining variants.
+- Complete remaining variants.
 - Add error checking to C code and generator.
 - Tests.
+- ...
