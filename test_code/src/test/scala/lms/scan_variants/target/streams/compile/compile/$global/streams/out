@@ -1,0 +1,328 @@
+[0m[[0mdebug[0m] [0m[0m
+[0m[[0mdebug[0m] [0mInitial source changes: [0m
+[0m[[0mdebug[0m] [0m	removed:Set()[0m
+[0m[[0mdebug[0m] [0m	added: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_optc.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/scannerlib.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_live_steps.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_unstaged.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_staged.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/scanner.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_live.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/utils.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_staged0.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dynvar.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/start.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query.scala)[0m
+[0m[[0mdebug[0m] [0m	modified: Set()[0m
+[0m[[0mdebug[0m] [0mRemoved products: Set()[0m
+[0m[[0mdebug[0m] [0mExternal API changes: API Changes: Set()[0m
+[0m[[0mdebug[0m] [0mModified binary dependencies: Set()[0m
+[0m[[0mdebug[0m] [0mInitial directly invalidated sources: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_optc.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/scannerlib.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_live_steps.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_unstaged.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_staged.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/scanner.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_live.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/utils.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_staged0.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dynvar.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/start.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query.scala)[0m
+[0m[[0mdebug[0m] [0m[0m
+[0m[[0mdebug[0m] [0mSources indirectly invalidated by:[0m
+[0m[[0mdebug[0m] [0m	product: Set()[0m
+[0m[[0mdebug[0m] [0m	binary dep: Set()[0m
+[0m[[0mdebug[0m] [0m	external source: Set()[0m
+[0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_optc.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/scannerlib.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_live_steps.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_unstaged.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_staged.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/scanner.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_live.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/utils.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query_staged0.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dynvar.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/start.scala, /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/query.scala)[0m
+[0m[[0mdebug[0m] [0mRecompiling all 13 sources: invalidated sources (13) exceeded 50.0% of all sources[0m
+[0m[[0minfo[0m] [0mCompiling 13 Scala sources to /home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/target/scala-2.10/classes...[0m
+[0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.10.4[0m
+[0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.10.4[0m
+[0m[[0mdebug[0m] [0mRunning cached compiler 71bc1581, interfacing (CompilerInterface) with Scala compiler version 2.10.4[0m
+[0m[[0mdebug[0m] [0mCalling Scala compiler with arguments  (CompilerInterface):[0m
+[0m[[0mdebug[0m] [0m	-bootclasspath[0m
+[0m[[0mdebug[0m] [0m	/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/resources.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jsse.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/charsets.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rhino.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jfr.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/classes:/home/gabriel/.sbt/boot/scala-2.10.4/lib/scala-library.jar[0m
+[0m[[0mdebug[0m] [0m	-classpath[0m
+[0m[[0mdebug[0m] [0m	/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/target/scala-2.10/classes[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:3: object virtualization is not a member of package scala[0m
+[0m[[31merror[0m] [0mimport scala.virtualization.lms.common._[0m
+[0m[[31merror[0m] [0m             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:4: object SourceContext is not a member of package reflect[0m
+[0m[[31merror[0m] [0mimport scala.reflect.SourceContext[0m
+[0m[[31merror[0m] [0m       ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:7: not found: type Base[0m
+[0m[[31merror[0m] [0mtrait UtilOps extends Base {[0m
+[0m[[31merror[0m] [0m                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:8: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                                                                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:8: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:8: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                                                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:9: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                                                                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:9: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                        ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:9: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:9: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext): Rep[Long][0m
+[0m[[31merror[0m] [0m                                                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:11: not found: type BaseExp[0m
+[0m[[31merror[0m] [0mtrait UtilOpsExp extends UtilOps with BaseExp {[0m
+[0m[[31merror[0m] [0m                                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:12: not found: type Def[0m
+[0m[[31merror[0m] [0m  case class ObjHashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                                                                                     ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:12: not found: type Rep[0m
+[0m[[31merror[0m] [0m  case class ObjHashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                                        ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:12: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  case class ObjHashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                                                              ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:13: not found: type Def[0m
+[0m[[31merror[0m] [0m  case class StrSubHashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:13: not found: type Rep[0m
+[0m[[31merror[0m] [0m  case class StrSubHashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:13: not found: type Rep[0m
+[0m[[31merror[0m] [0m  case class StrSubHashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                                                 ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:13: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  case class StrSubHashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) extends Def[Long][0m
+[0m[[31merror[0m] [0m                                                                         ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:14: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) = ObjHashCode(o)[0m
+[0m[[31merror[0m] [0m                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:14: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) = ObjHashCode(o)[0m
+[0m[[31merror[0m] [0m                                                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:15: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) = StrSubHashCode(o,len)[0m
+[0m[[31merror[0m] [0m                        ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:15: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) = StrSubHashCode(o,len)[0m
+[0m[[31merror[0m] [0m                                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:15: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) = StrSubHashCode(o,len)[0m
+[0m[[31merror[0m] [0m                                                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:17: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {[0m
+[0m[[31merror[0m] [0m                                                                                           ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:17: not found: type Def[0m
+[0m[[31merror[0m] [0m  override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {[0m
+[0m[[31merror[0m] [0m                                     ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:17: not found: type Transformer[0m
+[0m[[31merror[0m] [0m  override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {[0m
+[0m[[31merror[0m] [0m                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:17: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {[0m
+[0m[[31merror[0m] [0m                                                                           ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:20: value mirror is not a member of scala.lms.tutorial.UtilOps[0m
+[0m[[31merror[0m] [0m    case _ => super.mirror(e,f)[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:21: not found: type Exp[0m
+[0m[[31merror[0m] [0m  }).asInstanceOf[Exp[A]][0m
+[0m[[31merror[0m] [0m                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:23: not found: type ScalaGenBase[0m
+[0m[[31merror[0m] [0mtrait ScalaGenUtilOps extends ScalaGenBase {[0m
+[0m[[31merror[0m] [0m                              ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:27: not found: type Def[0m
+[0m[[31merror[0m] [0m  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {[0m
+[0m[[31merror[0m] [0m                                            ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:28: not found: value emitValDef[0m
+[0m[[31merror[0m] [0m    case ObjHashCode(o) => emitValDef(sym, src"$o.##")[0m
+[0m[[31merror[0m] [0m                           ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:29: value emitNode is not a member of AnyRef[0m
+[0m[[31merror[0m] [0m    case _ => super.emitNode(sym, rhs)[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:27: not found: type Sym[0m
+[0m[[31merror[0m] [0m  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {[0m
+[0m[[31merror[0m] [0m                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:32: not found: type CGenBase[0m
+[0m[[31merror[0m] [0mtrait CGenUtilOps extends CGenBase {[0m
+[0m[[31merror[0m] [0m                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:36: not found: type Def[0m
+[0m[[31merror[0m] [0m  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {[0m
+[0m[[31merror[0m] [0m                                            ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:37: not found: value emitValDef[0m
+[0m[[31merror[0m] [0m    case StrSubHashCode(o,len) => emitValDef(sym, src"hash($o,$len)")[0m
+[0m[[31merror[0m] [0m                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:38: value emitNode is not a member of AnyRef[0m
+[0m[[31merror[0m] [0m    case _ => super.emitNode(sym, rhs)[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:36: not found: type Sym[0m
+[0m[[31merror[0m] [0m  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {[0m
+[0m[[31merror[0m] [0m                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type NumericOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type PrimitiveOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type BooleanOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type LiftString[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type LiftNumeric[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type LiftBoolean[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                     ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type IfThenElse[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type Equal[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type RangeOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                 ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type OrderingOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type MiscOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type ArrayOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type StringOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                           ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type SeqOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                          ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type Functions[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type While[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                     ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type StaticData[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type Variables[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type LiftVariables[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:43: not found: type ObjectOps[0m
+[0m[[31merror[0m] [0mtrait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:44: not found: type SeqOpsCls[0m
+[0m[[31merror[0m] [0m  implicit def repStrToSeqOps(a: Rep[String]) = new SeqOpsCls(a.asInstanceOf[Rep[Seq[Char]]])[0m
+[0m[[31merror[0m] [0m                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:44: not found: type Rep[0m
+[0m[[31merror[0m] [0m  implicit def repStrToSeqOps(a: Rep[String]) = new SeqOpsCls(a.asInstanceOf[Rep[Seq[Char]]])[0m
+[0m[[31merror[0m] [0m                                 ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:45: not found: type Rep[0m
+[0m[[31merror[0m] [0m  override def infix_&&(lhs: Rep[Boolean], rhs: => Rep[Boolean])(implicit pos: scala.reflect.SourceContext): Rep[Boolean] =[0m
+[0m[[31merror[0m] [0m                                                                                                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:45: not found: type Rep[0m
+[0m[[31merror[0m] [0m  override def infix_&&(lhs: Rep[Boolean], rhs: => Rep[Boolean])(implicit pos: scala.reflect.SourceContext): Rep[Boolean] =[0m
+[0m[[31merror[0m] [0m                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:45: not found: type Rep[0m
+[0m[[31merror[0m] [0m  override def infix_&&(lhs: Rep[Boolean], rhs: => Rep[Boolean])(implicit pos: scala.reflect.SourceContext): Rep[Boolean] =[0m
+[0m[[31merror[0m] [0m                                                   ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:45: type SourceContext is not a member of package reflect[0m
+[0m[[31merror[0m] [0m  override def infix_&&(lhs: Rep[Boolean], rhs: => Rep[Boolean])(implicit pos: scala.reflect.SourceContext): Rep[Boolean] =[0m
+[0m[[31merror[0m] [0m                                                                                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:46: not found: value __ifThenElse[0m
+[0m[[31merror[0m] [0m    __ifThenElse(lhs, rhs, unit(false))[0m
+[0m[[31merror[0m] [0m    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:47: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def generate_comment(l: String): Rep[Unit][0m
+[0m[[31merror[0m] [0m                                   ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:48: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def comment[A:Manifest](l: String, verbose: Boolean = true)(b: => Rep[A]): Rep[A][0m
+[0m[[31merror[0m] [0m                                                                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:48: not found: type Rep[0m
+[0m[[31merror[0m] [0m  def comment[A:Manifest](l: String, verbose: Boolean = true)(b: => Rep[A]): Rep[A][0m
+[0m[[31merror[0m] [0m                                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type NumericOpsExpOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                              ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type PrimitiveOpsExpOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type BooleanOpsExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                            ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type IfThenElseExpOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type EqualExpBridgeOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                     ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type RangeOpsExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                            ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type OrderingOpsExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                             ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type MiscOpsExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                 ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type EffectExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                 ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type ArrayOpsExpOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type StringOpsExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type SeqOpsExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type FunctionsRecursiveExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                     ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type WhileExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type StaticDataExp[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                                              ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type VariablesExpOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                                                                 ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:51: not found: type ObjectOpsExpOpt[0m
+[0m[[31merror[0m] [0mtrait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {[0m
+[0m[[31merror[0m] [0m                                                                                                                                                                                                                                                                                                                                                      ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:52: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                                                                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:52: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:52: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                                  ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:52: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                                                              ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:53: not found: value Const[0m
+[0m[[31merror[0m] [0m    case Const(false) => rhs[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:54: value boolean_or is not a member of scala.lms.tutorial.Dsl with scala.lms.tutorial.UtilOpsExp[0m
+[0m[[31merror[0m] [0m    case _ => super.boolean_or(lhs, rhs)[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:56: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def boolean_and(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                                                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:56: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def boolean_and(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:56: not found: type Exp[0m
+[0m[[31merror[0m] [0m  override def boolean_and(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                                   ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:56: not found: type SourceContext[0m
+[0m[[31merror[0m] [0m  override def boolean_and(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {[0m
+[0m[[31merror[0m] [0m                                                                               ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:57: not found: value Const[0m
+[0m[[31merror[0m] [0m    case Const(true) => rhs[0m
+[0m[[31merror[0m] [0m         ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:58: value boolean_and is not a member of scala.lms.tutorial.Dsl with scala.lms.tutorial.UtilOpsExp[0m
+[0m[[31merror[0m] [0m    case _ => super.boolean_and(lhs, rhs)[0m
+[0m[[31merror[0m] [0m                    ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:61: not found: type Def[0m
+[0m[[31merror[0m] [0m  case class GenerateComment(l: String) extends Def[Unit][0m
+[0m[[31merror[0m] [0m                                                ^[0m
+[0m[[31merror[0m] [0m/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/tutorial/dslapi.scala:62: not found: value reflectEffect[0m
+[0m[[31merror[0m] [0m  def generate_comment(l: String) = reflectEffect(GenerateComment(l))[0m
+[0m[[31merror[0m] [0m                                    ^[0m
+[0m[[31merror[0m] [0m472 errors found[0m
+[0m[[0mdebug[0m] [0mCompilation failed (CompilerInterface)[0m
+[0m[[31merror[0m] [0m(compile:[31mcompile[0m) Compilation failed[0m
