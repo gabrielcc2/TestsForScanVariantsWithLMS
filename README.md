@@ -1,6 +1,6 @@
 # TestsForScanVariantsWithLMS
 
-In these tests we use Light-weight modular staging (LMS) (scala-lms.github.io) and their version of a DSL api (provided in the LMS tutorials site, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. Basically we are trying to study how code generation could be carried out for loop unrolling, branch free code, vectorization and parallelization using phthreads.
+In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (provided in the LMS tutorials site, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. Basically we are trying to study how code generation could be carried out for loop unrolling, branch free code, vectorization and parallelization using phthreads.
 
 The last 2 are still not included in this release.
 
@@ -22,5 +22,6 @@ The compare value is the right hand value of the pre-defined predicate (equals, 
 
 Pending work:
 - Possible migration to another DSL api (https://github.com/epfldata/c-scala).
-- Remaining variants.
+- Completing remaining variants.
+- Add error checking to C code and generator.
 - Tests.
