@@ -227,29 +227,38 @@ trait DslGenC extends CGenNumericOps
 void Scan(float*);
 int main(int argc, char *argv[])
 {
-  if (argc < 3) {
-    printf("Missing arguments. Usage: filename numberOfTuples compareValue\n");
+  if (argc < 4) {
+    printf("Missing arguments. Usage: filename numberOfTuples compareValue numThreads (min=1)\n");
     return 0;
   }
   FILE *ptr_file;
   char buf[1000];
   int numTuples=atoi(argv[2]);
   float compareValue=atof(argv[3]);
+  int numThreads=atoi(argv[4]);
+  int numReadTuples=0;
 
   ptr_file =fopen(argv[1],"r");
   if (!ptr_file){
     return 0;
   }
-  int numReadTuples=0;
+ 
+ 
+ 
   float *array;
-  array=(float*)malloc(((2*numTuples)+2)*sizeof(float));
+  array=(float*)malloc(((2*numTuples)+3+numThreads)*sizeof(float));
   array[0]=compareValue;
-  
   array[1]=(float)numTuples;
+  array[2]=(float)numThreads;
+  for (int i=0; i<numThreads; i++){
+	array[3+i]=(float)0;
+  }
+
   while (fgets(buf,1000, ptr_file)!=NULL && numReadTuples<numTuples){
-    array[numReadTuples+2]=atof(buf);
+    array[numReadTuples+3+numThreads]=atof(buf);
     numReadTuples++;
   }
+
   fclose(ptr_file);
   if (numReadTuples<numTuples){
     return 0;
