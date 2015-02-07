@@ -16,6 +16,8 @@ The resulting C code can be found in test_code/src/out.
 
 To run it you need a file consisting or a list of floats.
 
+To compile use gcc with options -std=c99 -pthread
+
 To run the C program you pass as input, in the command line: fileName numTuples compareValue numThreads
 
 The compare value is the right hand value of the pre-defined predicate (equals, greater than, etc) for comparing with every tuple.
@@ -24,9 +26,9 @@ If there is any problem installing sbt or configuring the code, please refer to:
 
 Upcoming work:
 - Complete remaining variants:
-   - Parallelization: Code for prefix-sum processing is already written. Need to print message so as to insert thread creation   and joining during post-processing. Also, figure out why it's giving event ordering errors.
-   
-   - Vectorization: Todo.
+   - Parallelization: Code for parallelization ready, now we need to insert the post-processing.
+   - Vectorization: To do.
 - Add error checking to C code and generator.
+- Clean code.
 - Tests.
 - ...
