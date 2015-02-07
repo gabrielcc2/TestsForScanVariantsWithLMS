@@ -81,10 +81,10 @@ class ScanVariantsTests extends TutorialFunSuite {
    /*Configuration for the variants to be applied*/
    var numInstructionsForUnrolling: Int=4;
    var instructions = new Array[String](numInstructionsForUnrolling); 
-   instructions(0) = "_";//Remove branching";  
-   instructions(1) = "Unroll"; //Unroll"; 
-   instructions(2) = "_"; //"Parallelize";
-   instructions(3) = "_";//Vectorize
+   instructions(0) = "_";//"Remove branching";  
+   instructions(1) = "_"; //"Unroll"; 
+   instructions(2) = "Parallelize";//"Parallelize"; 
+   instructions(3) = "_";//"Vectorize";
    var unrollDepth: Int=2
    var vectorSize: Int=4
 
@@ -139,11 +139,12 @@ class ScanVariantsTests extends TutorialFunSuite {
 		lazy val numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]];
 	
 		/*Local context variables*/
-		var outputPos: this.Variable[Int]=3 //Definition of the output position. It is by default, displaced by 3 + numThreadsSelected (if parallelized).
-		var one: this.Variable[Int]=1 //Definition of number 1, for typing purposes.
 		var zero: this.Variable[Int]=0 //Definition of number 0, for typing purposes.
+		var one: this.Variable[Int]=1 //Definition of number 1, for typing purposes.
 		var three: this.Variable[Int]=3 //Definition of number 3, for typing purposes.
+		var outputPos: this.Variable[Int]=3 //Definition of the output position. It is by default, displaced by 3 + numThreadsSelected (if parallelized).
 	
+
 		/*For ease of work, and after observing some unexpected typing issues (and forward references problems), we decided to place here the definition of 
 		the loop classes, in charge of handling the application of the variants.*/
 
@@ -160,6 +161,8 @@ class ScanVariantsTests extends TutorialFunSuite {
 			var unrolled: Boolean=_;//Flag to define if loop has been unrolled. False by default.
 			var parallelized: Boolean=_;//Flag to define if loop has been parallelized. False by default.
 			var threadsDisplacement: Rep[Int] =_;
+			var aux: Rep[Int]=_;
+			var aux2: Rep[Int]=_;
 
 			/*Parametric constructor. Takes as input the number of iterations, compare value and predictate.*/
 			def this (numIt: Rep[Int], compareValue: Rep[Float], pred:String){
@@ -170,11 +173,12 @@ class ScanVariantsTests extends TutorialFunSuite {
 				predicateType=pred;
 				numThreads=varIntToRepInt(one);
 				threadsDisplacement=varIntToRepInt(zero);
+				aux=varIntToRepInt(zero);
+				aux2=varIntToRepInt(zero);
 				numInst=1;
 				bfc=false;
 				unrolled=false;
 				parallelized=false;
-
 			}
 
 			/*Some getters...*/
@@ -208,8 +212,9 @@ class ScanVariantsTests extends TutorialFunSuite {
 				else if (instruction=="Unroll"){
 					unrolled=true;
 					numIterationsUnrolled=(numIterationsUnrolled/unrollDepth).asInstanceOf[Rep[Int]]
-					numInst=(numInst*(unrollDepth.asInstanceOf[Int])); /*The number of instructions only changes if there is more than one 
-													iteration on the remaining loop.*/
+					numInst=(numInst*(unrollDepth.asInstanceOf[Int])); 
+					/*TODO Check: The number of instructions only changes if there is more than one 		
+					iteration on the remaining loop.*/
 				}
 				else if (instruction=="Parallelize"){
 					parallelized=true;
@@ -235,28 +240,26 @@ class ScanVariantsTests extends TutorialFunSuite {
 					}
 
 					//Serial assignment of output positions...
-					var aux: Rep[Int]=input(3).asInstanceOf[Rep[Int]];
-					var aux2: Rep[Int]=varIntToRepInt(zero);
-					input(3)=varIntToRepInt(zero).asInstanceOf[Rep[Float]];
-					for (j <- (1 until numThreads): Rep[Range]) {
-						aux2=input(varIntToRepInt(three)+j).asInstanceOf[Rep[Int]]
-						input(3+j)=aux.asInstanceOf[Rep[Float]]
-						aux+=aux2;
-					}
-					outputPos=aux+3+numThreads;
+				//	aux=input(3).asInstanceOf[Rep[Int]];
+				//	input(3)=varIntToRepInt(zero).asInstanceOf[Rep[Float]];
+				//	for (k <- (1 until numThreads): Rep[Range]) {
+				//		aux2=input(3+k).asInstanceOf[Rep[Int]]
+				//		input(3+k)=aux.asInstanceOf[Rep[Float]]
+				//		aux+=aux2;
+				//	}
+				//	outputPos=aux+3+numThreads;
 	
-					for (j <- (0 until numThreads): Rep[Range]) {
-						this.runParallelChunk(j)//Should be done in parallel
-					}
-
+				//	for (l <- (0 until numThreads): Rep[Range]) {
+				//		this.runParallelChunk(l)//Should be done in parallel
+				//	}
 					//Parallel writing...					
 
 				}
 
 				/*Code generation for a non-optimized loop with the residual iterations after unrolling*/
 				if (this.unrolled){
-				        	if((((numIterationsUnrolled)*numInst)+3+threadsDisplacement)<(maxNumIt+3+threadsDisplacement)){
-							for (i <- ( (((numIterationsUnrolled)*numInst)+3+threadsDisplacement) until maxNumIt+3+threadsDisplacement): Rep[Range]) {
+				        	if((numIterationsUnrolled*numInst)<maxNumIt){
+							for (i <- ( ((numIterationsUnrolled*numInst)+3+threadsDisplacement) until maxNumIt+3+threadsDisplacement): Rep[Range]) {
 		        			  		this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
         					}
 					}		
@@ -269,10 +272,14 @@ class ScanVariantsTests extends TutorialFunSuite {
 			Takes as input the thread number.
 			It handles mapping from thread number to iteration number to input & output arrays, considering variants performed.*/
 			def runParallelPrefixSum(it: Rep[Int])= comment("parallel prefix sum", verbose = true){
-				for (i <- (0 until numIterationsUnrolled/numThreads): Rep[Range]) {
+				var count:Rep[Int]=varIntToRepInt(zero)
+				for (i <- (0 until (numIterationsUnrolled.asInstanceOf[Rep[Float]]/(numThreads).asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]): Rep[Range]) {
 					var currInst:Int=0;
 					while (currInst<numInst){
-						var itVal:Rep[Int]=(((i+(it*numIterationsUnrolled/numThreads))*numInst)+currInst)+3+threadsDisplacement
+						var itVal:Rep[Int]=3+threadsDisplacement;
+						itVal+=currInst;
+						itVal+=((i+(it*numIterationsUnrolled/numThreads))*numInst)
+						var count2:Rep[Int]=count;
 						if (bfc){
 							if (predicate=="equals"){
 									//println(input(itVal))
@@ -318,6 +325,7 @@ class ScanVariantsTests extends TutorialFunSuite {
    						}	
 						else if (predicate=="lesserThanEquals"){
 							if (input(itVal)<=value.asInstanceOf[Rep[Float]]){
+								count2+=1;
 								input(3+it)=input(3+it)+1;					
 							}
    						}
@@ -331,8 +339,10 @@ class ScanVariantsTests extends TutorialFunSuite {
 						}
 				
 						currInst=currInst+1;
+						count+=count2;
 					} //End of while loop
-				}//End of for loop		
+				}//End of for loop
+				input(3+it)=count.asInstanceOf[Rep[Float]];		
 			}//End of def runParallelPrefixSum
 
 
@@ -344,7 +354,9 @@ class ScanVariantsTests extends TutorialFunSuite {
 				for (i <- (0 until numIterationsUnrolled/numThreads): Rep[Range]) {
 					var currInst:Int=0;
 					while (currInst<numInst){
-						var itVal:Rep[Int]=(((i+(it*numIterationsUnrolled/numThreads))*numInst)+currInst)+3+threadsDisplacement
+						var itVal:Rep[Int]=3+threadsDisplacement;
+						itVal+=currInst;
+						itVal+=((i+(it*numIterationsUnrolled/numThreads))*numInst)
 						if (bfc){
 							if (predicate=="equals"){
 									//println(input(itVal))
@@ -600,18 +612,20 @@ class ScanVariantsTests extends TutorialFunSuite {
 			should be changed here.*/
 		}
 
-		if (iterationSpace.isParallelized()){
-			outputPos+=numThreadsSelected
-		}
+		for (i <- (0 until iterationSpace.getThreadsDisplacement()): Rep[Range]) {
+        	  input(3+i)=varIntToRepInt(zero).asInstanceOf[Rep[Float]];
+        	}
 
 		iterationSpace.runLoop();
 		
 		/*Printing of the output array*/	
 		println("Output array: ");
-		var maxVal:Rep[Int]=varIntToRepInt(outputPos)-varIntToRepInt(three);
-		maxVal-=iterationSpace.getThreadsDisplacement();
-		for (i <- (0 until maxVal): Rep[Range]) {
-        	  println(input(maxNumIt+3+iterationSpace.getThreadsDisplacement()+i));
+//		var maxVal:Rep[Int]=varIntToRepInt(outputPos)-varIntToRepInt(three);
+//		maxVal-=iterationSpace.getThreadsDisplacement();
+//		for (i <- (0 until maxVal): Rep[Range]) {
+//        	  println(input(maxNumIt+3+iterationSpace.getThreadsDisplacement()+i));
+		for (i <- (0 until (maxNumIt*2)+3+iterationSpace.getThreadsDisplacement()): Rep[Range]) {
+        	  println(input(i));
         	}
 
       	}//End of snippet function
