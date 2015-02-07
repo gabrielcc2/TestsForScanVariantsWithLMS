@@ -224,13 +224,17 @@ trait DslGenC extends CGenNumericOps
 #include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <pthread.h>
 void Scan(float*);
 int main(int argc, char *argv[])
 {
   if (argc < 4) {
-    printf("Missing arguments. Usage: filename numberOfTuples compareValue numThreads (min=1)\n");
+    printf("Missing arguments. Usage: filename numberOfTuples compareValue numThreads\n");
     return 0;
   }
+  printf("Usage: filename numberOfTuples compareValue numThreads\n");
+  printf("If the operator is not parallelized, please pass numThreads=0\n");
+
   FILE *ptr_file;
   char buf[1000];
   int numTuples=atoi(argv[2]);
@@ -246,16 +250,16 @@ int main(int argc, char *argv[])
  
  
   float *array;
-  array=(float*)malloc(((2*numTuples)+3+numThreads)*sizeof(float));
+  array=(float*)malloc(((2*numTuples)+3+(2*numThreads))*sizeof(float));
   array[0]=compareValue;
   array[1]=(float)numTuples;
   array[2]=(float)numThreads;
-  for (int i=0; i<numThreads; i++){
+  for (int i=0; i<(2*numThreads); i++){
 	array[3+i]=(float)0;
   }
 
   while (fgets(buf,1000, ptr_file)!=NULL && numReadTuples<numTuples){
-    array[numReadTuples+3+numThreads]=atof(buf);
+    array[numReadTuples+3+(2*numThreads)]=atof(buf);
     numReadTuples++;
   }
 

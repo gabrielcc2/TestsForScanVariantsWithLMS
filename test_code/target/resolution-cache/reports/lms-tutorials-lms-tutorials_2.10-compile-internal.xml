@@ -7,14 +7,14 @@
 		revision="0.1-SNAPSHOT"
 		conf="compile-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150128085540"/>
+		date="20150207171826"/>
 	<dependencies>
 		<module organisation="EPFL" name="lms_2.10">
-			<revision name="0.3-SNAPSHOT" status="integration" pubdate="20150127231112" resolver="sbt-chain" artresolver="sbt-chain" downloaded="false" searched="true" default="false" conf="default(compile), compile" position="3">
-				<metadata-artifact status="no" details="" size="1472" time="0" location="/home/gabriel/.ivy2/cache/EPFL/lms_2.10/ivy-0.3-SNAPSHOT.xml" searched="true" origin-is-local="true" origin-location="/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/ivys/ivy.xml"/>
+			<revision name="0.3-SNAPSHOT" status="integration" pubdate="20150207171505" resolver="local" artresolver="local" downloaded="false" searched="true" default="false" conf="default(compile), compile" position="3">
+				<metadata-artifact status="no" details="" size="1472" time="0" location="/home/gabriel/.ivy2/cache/EPFL/lms_2.10/ivy-0.3-SNAPSHOT.xml" searched="true" original-local-location="/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/ivys/ivy.xml" origin-is-local="true" origin-location="/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/ivys/ivy.xml"/>
 				<caller organisation="lms-tutorials" name="lms-tutorials_2.10" conf="optional, compile, provided, compile-internal" rev="0.3-SNAPSHOT" rev-constraint-default="0.3-SNAPSHOT" rev-constraint-dynamic="0.3-SNAPSHOT" callerrev="0.1-SNAPSHOT"/>
 				<artifacts>
-					<artifact name="lms_2.10" type="jar" ext="jar" status="no" details="" size="2706785" time="0" location="/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/jars/lms_2.10.jar">
+					<artifact name="lms_2.10" type="jar" ext="jar" status="no" details="" size="2706775" time="0" location="/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/jars/lms_2.10.jar">
 						<origin-location is-local="true" location="/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/jars/lms_2.10.jar"/>
 					</artifact>
 				</artifacts>

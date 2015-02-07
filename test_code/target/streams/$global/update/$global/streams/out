@@ -7,7 +7,7 @@
 [0m[[0mdebug[0m] [0m== resolving dependencies for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT [compile][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT->org.scala-lang.virtualized#scala-compiler;2.10.2 [compile->default(compile)][0m
 [0m[[0minfo[0m] [0mResolving org.scala-lang.virtualized#scala-compiler;2.10.2 ...[0m
-[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7a71edaa[0m
+[0m[[0mdebug[0m] [0msbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@13ae2297[0m
 [0m[[0mdebug[0m] [0msbt-chain: module revision found in cache: org.scala-lang.virtualized#scala-compiler;2.10.2[0m
 [0m[[0mdebug[0m] [0m	found org.scala-lang.virtualized#scala-compiler;2.10.2 in sbt-chain[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT->org.scala-lang.virtualized#scala-compiler;2.10.2 [compile->runtime][0m
@@ -66,8 +66,10 @@
 [0m[[0mdebug[0m] [0m		tried /home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/ivys/ivy.xml[0m
 [0m[[0mdebug[0m] [0m	local: found md file for EPFL#lms_2.10;0.3-SNAPSHOT[0m
 [0m[[0mdebug[0m] [0m		=> /home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/ivys/ivy.xml (0.3-SNAPSHOT)[0m
-[0m[[0mdebug[0m] [0m	default-cache: revision in cache (not updated): EPFL#lms_2.10;0.3-SNAPSHOT[0m
-[0m[[0mdebug[0m] [0m	found EPFL#lms_2.10;0.3-SNAPSHOT in sbt-chain[0m
+[0m[[0mdebug[0m] [0m	default-cache: revision in cache is not up to date: EPFL#lms_2.10;0.3-SNAPSHOT[0m
+[0m[[0mdebug[0m] [0m	[NOT REQUIRED] EPFL#lms_2.10;0.3-SNAPSHOT!ivy.xml(ivy.original)[0m
+[0m[[0mdebug[0m] [0mEPFL#lms_2.10;0.3-SNAPSHOT has changed: deleting old artifacts[0m
+[0m[[0mdebug[0m] [0m	found EPFL#lms_2.10;0.3-SNAPSHOT in local[0m
 [0m[[0mdebug[0m] [0m== resolving dependencies EPFL#lms_2.10;0.3-SNAPSHOT->org.scala-lang.virtualized#scala-compiler;2.10.2 [compile->default(compile)][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies EPFL#lms_2.10;0.3-SNAPSHOT->org.scala-lang.virtualized#scala-compiler;2.10.2 [compile->runtime][0m
 [0m[[0mdebug[0m] [0m== resolving dependencies EPFL#lms_2.10;0.3-SNAPSHOT->org.scala-lang.virtualized#scala-compiler;2.10.2 [compile->compile][0m
@@ -468,6 +470,7 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.virtualized#scala-compiler;2.10.2!scala-compiler.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.virtualized#scala-library;2.10.2!scala-library.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.virtualized#scala-reflect;2.10.2!scala-reflect.jar[0m
+[0m[[0mdebug[0m] [0m		tried /home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/jars/lms_2.10.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] EPFL#lms_2.10;0.3-SNAPSHOT!lms_2.10.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scalatest#scalatest_2.10;2.1.2!scalatest_2.10.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang#scala-library;2.10.3!scala-library.jar[0m
@@ -475,7 +478,7 @@
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.virtualized#scala-actors;2.10.2!scala-actors.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.scala-lang.virtualized#jline;2.10.2!jline.jar[0m
 [0m[[0mdebug[0m] [0m	[NOT REQUIRED] org.fusesource.jansi#jansi;1.4!jansi.jar[0m
-[0m[[0mdebug[0m] [0m:: resolution report :: resolve 2127ms :: artifacts dl 34ms[0m
+[0m[[0mdebug[0m] [0m:: resolution report :: resolve 2135ms :: artifacts dl 43ms[0m
 [0m[[0mdebug[0m] [0m	report for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT compile produced in /home/gabriel/Desktop/lms/test_code/target/resolution-cache/reports/lms-tutorials-lms-tutorials_2.10-compile.xml[0m
 [0m[[0mdebug[0m] [0m	report for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT runtime produced in /home/gabriel/Desktop/lms/test_code/target/resolution-cache/reports/lms-tutorials-lms-tutorials_2.10-runtime.xml[0m
 [0m[[0mdebug[0m] [0m	report for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT test produced in /home/gabriel/Desktop/lms/test_code/target/resolution-cache/reports/lms-tutorials-lms-tutorials_2.10-test.xml[0m
@@ -489,5 +492,5 @@
 [0m[[0mdebug[0m] [0m	report for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT docs produced in /home/gabriel/Desktop/lms/test_code/target/resolution-cache/reports/lms-tutorials-lms-tutorials_2.10-docs.xml[0m
 [0m[[0mdebug[0m] [0m	report for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT pom produced in /home/gabriel/Desktop/lms/test_code/target/resolution-cache/reports/lms-tutorials-lms-tutorials_2.10-pom.xml[0m
 [0m[[0mdebug[0m] [0m	report for lms-tutorials#lms-tutorials_2.10;0.1-SNAPSHOT scala-tool produced in /home/gabriel/Desktop/lms/test_code/target/resolution-cache/reports/lms-tutorials-lms-tutorials_2.10-scala-tool.xml[0m
-[0m[[0mdebug[0m] [0m	resolve done (2127ms resolve - 34ms download)[0m
+[0m[[0mdebug[0m] [0m	resolve done (2135ms resolve - 43ms download)[0m
 [0m[[0minfo[0m] [0mDone updating.[0m
