@@ -16,7 +16,11 @@ The resulting C code can be found in test_code/src/out.
 
 To run it you need a file consisting or a list of floats.
 
-To compile use gcc with options -std=c99 -pthread.*
+To compile use gcc with options -std=c99 -pthread 
+
+(Note that G++ doesnt accept our parallel code, since we do a definition of functions from within another functions. This was our decision so as to allow the new functions to access local variables. 
+
+To change this would require a more elaborate post-processing scheme than the one we've developed.)
 
 To run the C program you pass as input, in the command line: fileName numTuples compareValue numThreads. If not parallelized, numThreads should be 0. If parallelized, numThreads should start at 1.
 
@@ -48,5 +52,3 @@ Upcoming work:
 - Test for execution time.
 - Study potential improvements + additional configurability options, if fitting. 
 - ...
-
-* G++ doesnt accept our parallel code, since we do a definition of functions from within another functions. This was our decision so as to allow the new functions to access local variables. To change this would require a more elaborate post-processing scheme than the one we use.
