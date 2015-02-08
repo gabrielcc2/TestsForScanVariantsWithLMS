@@ -69,6 +69,10 @@ Future work:
 package scala.lms.scan_variants
 
 import scala.virtualization.lms.common._
+import scala.io.Source
+import java.io.PrintWriter
+import java.io.File
+
 
 class ScanVariantsTests extends TutorialFunSuite {
 
@@ -81,9 +85,9 @@ class ScanVariantsTests extends TutorialFunSuite {
    /*Configuration for the variants to be applied*/
    var numInstructionsForUnrolling: Int=4;
    var instructions = new Array[String](numInstructionsForUnrolling); 
-   instructions(0) = "_";//"Remove branching";  
-   instructions(1) = "_"; //"Unroll"; 
-   instructions(2) = "Parallelize";//"Parallelize"; 
+   instructions(0) = "_";//Remove branching  
+   instructions(1) = "Unroll"; //"Unroll"; 
+   instructions(2) = "_";//"Parallelize"; 
    instructions(3) = "_";//"Vectorize";
    var unrollDepth: Int=2
    var vectorSize: Int=4
@@ -258,6 +262,14 @@ we can only assign a value to a RepInt.
 
 				}
 
+				/*Code generation for a non-optimized loop with the residual iterations after incomplete parallelization*/
+		//		if (this.parallelized){
+		//		        	if(((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*numInst*numThreads)<maxNumIt){
+		//					for (i <- ( (((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*numInst*numThreads)+3+(2*threadsDisplacement)) until maxNumIt+3+(2*threadsDisplacement)): Rep[Range]) {
+		  //      			  		this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
+        		//			}
+			//		}		
+			//	}
 				/*Code generation for a non-optimized loop with the residual iterations after unrolling*/
 				if (this.unrolled){
 				        	if((numIterationsUnrolled*numInst)<maxNumIt){
@@ -359,72 +371,72 @@ we can only assign a value to a RepInt.
 						if (bfc){
 							if (predicate=="equals"){
 									//println(input(itVal))
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 									count+=(input(itVal)==value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
 							}
    							else if (predicate=="greaterThan"){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=(input(itVal)>value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
    							}	
 							else if (predicate=="greaterThanEquals"){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 	
 								count+=(input(itVal)>=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
    							}
 							else if (predicate=="lesserThan"){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=(input(itVal)<value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];  	   								}
 							else if (predicate=="lesserThanEquals"){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=(input(itVal)<=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];	
 		   					}
 							else if (predicate=="notEquals"){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=(input(itVal)!=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
 		      					}
 			   				else {
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;
 							}
 						}
 						else if (predicate=="equals"){
 							if (input(itVal)==value.asInstanceOf[Rep[Float]]){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;
 							}
 						}
    						else if (predicate=="greaterThan"){
 							if (input(itVal)>value.asInstanceOf[Rep[Float]]){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;
 							}
    						}	
 						else if (predicate=="greaterThanEquals"){
 							if (input(itVal)>=value.asInstanceOf[Rep[Float]]){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;
 							}
    						}
 						else if (predicate=="lesserThan"){
 							if (input(itVal)<value.asInstanceOf[Rep[Float]]){
-				input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;
 							}
    						}	
 						else if (predicate=="lesserThanEquals"){
 							if (input(itVal)<=value.asInstanceOf[Rep[Float]]){
-				input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;					
 							}
    						}
 						else if (predicate=="notEquals"){
 							if (input(itVal)!=value.asInstanceOf[Rep[Float]]){
-				input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;							
 							}
    						}
    						else {
-					input((input(3+it+threadsDisplacement)+3+(2*threadsDisplacement)+maxNumIt+count).asInstanceOf[Rep[Int]])=input(itVal);
+								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
 								count+=1;						
 						}
 				
@@ -619,6 +631,9 @@ we can only assign a value to a RepInt.
 		for (i <- (0 until varIntToRepInt(outputPos)): Rep[Range]) {
         	  println(input(i+3+(2*iterationSpace.getThreadsDisplacement())+maxNumIt));
         	}
+		if(varIntToRepInt(outputPos)==varIntToRepInt(zero)){
+		  println("No results found.")
+		}
 
       	}//End of snippet function
 
@@ -627,7 +642,154 @@ we can only assign a value to a RepInt.
     }//End of use of DSL driver
 
     check("ScanVariants_"+predicate, snippet.code, "c")     /*The naming scheme can be modified in this line*/
-    
+   
+   var fileLines = io.Source.fromFile("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c").getLines.toList
+   if(fileLines.filter(x=>x.contains("x0[2]")).length>0){
+	   val numThreadsLine=fileLines.filter(x=>x.contains("x0[2]")).head;
+   	   var arrayOfSplitting: Array[java.lang.String] = numThreadsLine.split(" ")
+   val numThreadsIdentifier=arrayOfSplitting(3)
+   val loopHeaders= fileLines.filter(x=> x.contains("for(")).filter(x=> x.contains("< "+numThreadsIdentifier))
+   if (loopHeaders.length>0){
+   	val prefixSumHeader=loopHeaders(0);
+   	val parallelChunkHeader=loopHeaders(2);
+   	arrayOfSplitting= prefixSumHeader.split("=0")
+   	arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ");
+   	val integerRepresentation= arrayOfSplitting(0);
+   	val iteratorName_prefixSum=arrayOfSplitting(1);
+   	arrayOfSplitting = parallelChunkHeader.split("=0")
+   	arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ");
+   	val iteratorName_parallelChunk=arrayOfSplitting(1);
+   	def insert[A](xs: List[A], extra: List[A])(p: A => Boolean) = {
+  		xs.map(x => if (p(x)) extra ::: List(x) else List(x)).flatten
+   	}
+	var auxList  = List[String]()
+	auxList= "  pthread_t threads[("+integerRepresentation+")"+numThreadsIdentifier+"];"::auxList
+	auxList=auxList:+("  "+integerRepresentation+" *inputArray;")
+        auxList=auxList:+("  inputArray=("+integerRepresentation+"*)malloc("+numThreadsIdentifier+"*sizeof("+integerRepresentation+"));")
+	fileLines=insert(fileLines,auxList) {_ == prefixSumHeader}
+	var str: String =" ";
+	var forHeaderDetected: Boolean = false;
+	var firstMessageSpotted: Boolean = false;
+	var doNothing: Boolean = false;
+	auxList  = List[String]()
+	var outputList  = List[String]()
+	for (str<- fileLines){
+		if (!forHeaderDetected){
+			if (str==prefixSumHeader){
+				forHeaderDetected=true;
+			}
+			else{
+				outputList=outputList:+(str)
+			}
+		}
+		else{
+		    if (!firstMessageSpotted){
+			auxList=auxList:+(str)
+			if(str.contains("//#parallel prefix sum")){
+				firstMessageSpotted=true;
+			}
+		    }
+		    else if (!doNothing){
+			auxList=auxList:+(str)
+			if(str.contains("//#parallel prefix sum")){
+				doNothing=true;
+			}
+		    }
+		}
+	}
+	outputList=outputList:+("  void* parallelPrefixSum(void* input){")
+	outputList=outputList:+("    "+integerRepresentation+" "+iteratorName_prefixSum+"=*("+integerRepresentation+"*)input;")
+        outputList=outputList++auxList
+	outputList=outputList:+("  }")
+	outputList=outputList:+(prefixSumHeader)
+	outputList=outputList:+("	inputArray["+iteratorName_prefixSum+"]="+iteratorName_prefixSum+";")
+	outputList=outputList:+("	pthread_create(&threads["+iteratorName_prefixSum+"], NULL, parallelPrefixSum, (void *)&inputArray["+iteratorName_prefixSum+"]);")
+	outputList=outputList:+("  }")
+	outputList=outputList:+(prefixSumHeader)
+	outputList=outputList:+("	pthread_join(threads["+iteratorName_prefixSum+"], NULL);")
+	outputList=outputList:+("  }")
+	
+	auxList  = List[String]()
+	forHeaderDetected= false;
+	firstMessageSpotted= false;
+	var secondMessageSpotted:Boolean= false;
+	var thirdMessageSpotted:Boolean= false;
+	var forthMessageSpotted:Boolean= false;
+	var trailingLineRemoved:Boolean= false;
+	doNothing= false;
+
+	for (str<- fileLines){
+		if (!firstMessageSpotted){
+			if(str.contains("//#parallel prefix sum")){
+				firstMessageSpotted=true;
+			}
+		}
+		else if (!secondMessageSpotted){
+			if(str.contains("//#parallel prefix sum")){
+				secondMessageSpotted=true;
+			}
+		}
+		else if(!trailingLineRemoved){
+			trailingLineRemoved=true;
+		}
+		else if (!forHeaderDetected){
+			if(str!=parallelChunkHeader){
+				outputList=outputList:+(str)
+			}
+			else{
+				forHeaderDetected=true;
+			}
+		}
+		else if (!thirdMessageSpotted){
+			auxList=auxList:+(str)
+			if(str.contains("//#parallel chunk")){
+				thirdMessageSpotted=true;
+			}			
+		}	
+		else if (!forthMessageSpotted){
+			auxList=auxList:+(str)
+			if(str.contains("//#parallel chunk")){
+				forthMessageSpotted=true;
+			}			
+		}			
+	}
+	outputList=outputList:+("  void* parallelChunk(void* input){");
+	outputList=outputList:+("    "+integerRepresentation+" "+iteratorName_parallelChunk+"=*("+integerRepresentation+"*)input;")
+        outputList=outputList++auxList
+	outputList=outputList:+("  }")
+	outputList=outputList:+(parallelChunkHeader)
+	outputList=outputList:+("  	pthread_create(&threads["+iteratorName_parallelChunk+"], NULL, parallelChunk, (void *)&inputArray["+iteratorName_parallelChunk+"]);") 
+	outputList=outputList:+("  }")
+	outputList=outputList:+(parallelChunkHeader)
+	outputList=outputList:+("	pthread_join(threads["+iteratorName_parallelChunk+"], NULL);")
+	outputList=outputList:+("  }")
+	firstMessageSpotted=false;
+	secondMessageSpotted=false;
+	trailingLineRemoved= false;
+	for (str <-fileLines){
+		if(!firstMessageSpotted){
+			if(str.contains("//#parallel chunk")){
+				firstMessageSpotted=true;
+			}
+		}
+		else if (!secondMessageSpotted){
+			if(str.contains("//#parallel chunk")){
+				secondMessageSpotted=true;
+			}
+		}
+		else if (!trailingLineRemoved){
+				trailingLineRemoved=true;
+		}
+		else{
+			outputList=outputList:+(str)
+		}
+	}	
+	val pw = new PrintWriter(new File("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c"))
+	for (str<- outputList){
+		pw.write(str+"\n");
+	}
+	pw.close();
+   }}
   } //End of test "Scan Variants"
 } //End of class ScanVariantsTest
 

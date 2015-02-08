@@ -234,6 +234,7 @@ int main(int argc, char *argv[])
   }
   printf("Usage: filename numberOfTuples compareValue numThreads\n");
   printf("If the operator is not parallelized, please pass numThreads=0\n");
+  printf("If the operator is parallelized and numThreads=0, it will result in errors.\n");
 
   FILE *ptr_file;
   char buf[1000];

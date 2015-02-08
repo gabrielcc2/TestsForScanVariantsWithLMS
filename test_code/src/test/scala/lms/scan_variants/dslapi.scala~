@@ -224,7 +224,7 @@ trait DslGenC extends CGenNumericOps
 #include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <pthreads.h>
+#include <pthread.h>
 void Scan(float*);
 int main(int argc, char *argv[])
 {

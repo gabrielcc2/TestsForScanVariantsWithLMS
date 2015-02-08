@@ -25,10 +25,25 @@ The compare value is the right hand value of the pre-defined predicate (equals, 
 If there is any problem installing sbt or configuring the code, please refer to: https://github.com/epfldata/lms
 
 Upcoming work:
-- Complete remaining variants:
-   - Parallelization: Code for parallelization ready, now we need to insert the post-processing.
-   - Vectorization: To do.
+- Correct current found bugs:
+  - Thread library bug: Occasional different values observed in repeated runs with same input+configuration.
+  - Bogus behaviour with parallelization and inexact division number of iterations/number of threads.
+- Standardize processing of residual iterations.
+
+- Test in combinations: 
+  - Parallelized+ Check inexact cases: Previously passed with bugs.
+  - Unrolled+ Check inexact cases: Previously Ok.
+  - BFC: Previously Ok.
+  - Parallelized and Unrolled+ Check inexact cases for both: Previously passed with bugs.
+  - Parallelized and BFC+ Check inexact cases: Previously passed with bugs.
+  - Unrolled and BFC+ Check inexact cases: Previously Ok.
+  - Parallelized and Unrolled and BFC+ Check inexact cases for Unrolled and Parallelized: Previously passed with bugs.
+
+- Complete remaining variants: Vectorization
+- Re-test
 - Add error checking to C code and generator.
-- Clean code.
-- Tests.
+- Clean generators code.
+- Study how to further clean the generated code.
+- Test for execution time.
+- Propose improvements + additional configurability options, if fitting. 
 - ...

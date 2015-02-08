@@ -2,21 +2,21 @@
 [0m[[0mdebug[0m] [0mInitial source changes: [0m
 [0m[[0mdebug[0m] [0m	removed:Set()[0m
 [0m[[0mdebug[0m] [0m	added: Set()[0m
-[0m[[0mdebug[0m] [0m	modified: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/scan_variants/dslapi.scala)[0m
+[0m[[0mdebug[0m] [0m	modified: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/scan_variants/scanVariants.scala)[0m
 [0m[[0mdebug[0m] [0mRemoved products: Set()[0m
 [0m[[0mdebug[0m] [0mExternal API changes: API Changes: Set()[0m
 [0m[[0mdebug[0m] [0mModified binary dependencies: Set()[0m
-[0m[[0mdebug[0m] [0mInitial directly invalidated sources: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/scan_variants/dslapi.scala)[0m
+[0m[[0mdebug[0m] [0mInitial directly invalidated sources: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/scan_variants/scanVariants.scala)[0m
 [0m[[0mdebug[0m] [0m[0m
 [0m[[0mdebug[0m] [0mSources indirectly invalidated by:[0m
 [0m[[0mdebug[0m] [0m	product: Set()[0m
 [0m[[0mdebug[0m] [0m	binary dep: Set()[0m
 [0m[[0mdebug[0m] [0m	external source: Set()[0m
-[0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/scan_variants/dslapi.scala)[0m
+[0m[[0mdebug[0m] [0mAll initially invalidated sources: Set(/home/gabriel/Desktop/lms/test_code/src/test/scala/lms/scan_variants/scanVariants.scala)[0m
 [0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/gabriel/Desktop/lms/test_code/target/scala-2.10/test-classes...[0m
 [0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.10.2[0m
 [0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.10.2[0m
-[0m[[0mdebug[0m] [0mRunning cached compiler 54383200, interfacing (CompilerInterface) with Scala compiler version 2.10.2-20140310-140650-2481f036a5[0m
+[0m[[0mdebug[0m] [0mRunning cached compiler 10f826d5, interfacing (CompilerInterface) with Scala compiler version 2.10.2-20140310-140650-2481f036a5[0m
 [0m[[0mdebug[0m] [0mCalling Scala compiler with arguments  (CompilerInterface):[0m
 [0m[[0mdebug[0m] [0m	-Yvirtualize[0m
 [0m[[0mdebug[0m] [0m	-deprecation[0m
@@ -24,9 +24,7 @@
 [0m[[0mdebug[0m] [0m	/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/resources.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jsse.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jce.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/charsets.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rhino.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/jfr.jar:/usr/lib/jvm/java-7-openjdk-amd64/jre/classes:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-library/jars/scala-library-2.10.2.jar[0m
 [0m[[0mdebug[0m] [0m	-classpath[0m
 [0m[[0mdebug[0m] [0m	/home/gabriel/Desktop/lms/test_code/target/scala-2.10/test-classes:/home/gabriel/Desktop/lms/test_code/target/scala-2.10/classes:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-compiler/jars/scala-compiler-2.10.2.jar:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-reflect/jars/scala-reflect-2.10.2.jar:/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/jars/lms_2.10.jar:/home/gabriel/.ivy2/cache/org.scalatest/scalatest_2.10/jars/scalatest_2.10-2.1.2.jar:/home/gabriel/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.10.3.jar:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-actors/jars/scala-actors-2.10.2.jar[0m
-[0m[[33mwarn[0m] [0mthere were 1 feature warning(s); re-run with -feature for details[0m
-[0m[[33mwarn[0m] [0mone warning found[0m
-[0m[[0mdebug[0m] [0mScala compilation took 56.88267192 s[0m
+[0m[[0mdebug[0m] [0mScala compilation took 66.55910812 s[0m
 [0m[[0mdebug[0m] [0mNew invalidations:[0m
 [0m[[0mdebug[0m] [0m	Set()[0m
 [0m[[0mdebug[0m] [0mInitial set of included nodes: Set()[0m

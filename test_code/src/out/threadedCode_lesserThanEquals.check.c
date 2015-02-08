@@ -95,7 +95,6 @@ void Scan(float*  x0) {
   }
   void* parallelChunk(void* input){
     int32_t x57=*(int32_t*)input;
-    printf("Value %d\n",x57);
     int32_t x62 = x57 * x5;//x5 needed
     int32_t x63 = x62 / x7; //x7 needed
     int32_t x68 = 3 + x57;
@@ -120,8 +119,7 @@ void Scan(float*  x0) {
       } else {
       }
     }
-    //#parallel chunk
- 
+    //#parallel chunk 
   }
   int32_t *inputArray;
   inputArray=(int32_t*)malloc(x7*sizeof(int32_t));
@@ -154,6 +152,7 @@ void Scan(float*  x0) {
     x4 = x53;
   } else {
   }
+
   for(int x57=0; x57 < x7; x57++) {
    	pthread_create(&threads[x57], NULL, parallelChunk, (void *)&inputArray[x57]); 
   }
