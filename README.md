@@ -45,10 +45,16 @@ Upcoming work:
 
 - Correct, if any, issues with behaviour at limits.
 
+- Check if it's perhaps better to generate a parallelization at specific thread number instead of passing this as parameter. Change accordingly.
 - Complete remaining variants: Vectorization
 - Re-test
 - Clean generators code.
 - Study how to further clean the generated code.
 - Test for execution time.
 - Study potential improvements + additional configurability options, if fitting. 
+
+Optional work for deployment:
+- Embed generator in cleaner function, taking input from console, so as to be usable by an existing system.
+- Design and apply a clear scheme for naming the generated codes according to variants used, or to other requirements from existing system.
+- Create copies of this that generate code for vectors of ints and other types of data (so far only float is supported).
 - ...

@@ -46,24 +46,13 @@ Notes on variants applied:
 
 *********************************************************************************************************************************************
 Working Notes:
-
-Some ideas for parallelization can be found below, as comments to the code. 
-
-Ideas for vectorization: ?
-
-If not possible to generate the code for parallelization or vectorization with LMS, perhaps it could be added by getting LMS to output some
-special strings to mark where parallelization should be inserted, and then post-processing the generated code with text insertion and deletion. 
-If this is accomplished, then it could be further wrapped in an outer Scala class, so as to have a single call to the code-generator, and it's use 
-of processing and post-processeing wouldn't be noticed by the final system.
-
+...
+List of some limitations observed from the DSL api:
+Its not possible to do multiple assignments to a position in an Array of Rep: only the first is performed.
+We cannot use a Rep as a counter either. The attempt of changing the value multiple times gets it to not show.
+We cannot cast a RepInt to a VarInt, but the other way around is Ok.
 
 *********************************************************************************************************************************************
-Future work:
-1) Embed test in cleaner function, taking input from console, so as to be usable by an existing system.
-2) Design and apply a clear scheme for naming the generated codes according to variants used, or to other requirements from existing system.
-3) Create copies of this that generate code for vectors of ints and other types of data.
-------------------------------
-
 */
 
 package scala.lms.scan_variants
@@ -89,7 +78,7 @@ class ScanVariantsTests extends TutorialFunSuite {
    instructions(1) = "Unroll"; //"Unroll"; 
    instructions(2) = "_";//"Parallelize"; 
    instructions(3) = "_";//"Vectorize";
-   var unrollDepth: Int=2
+   var unrollDepth: Int=5
    var vectorSize: Int=4
 
    /*Configuration for the predicate*/
@@ -132,8 +121,8 @@ class ScanVariantsTests extends TutorialFunSuite {
 
 
 	/*Snippet function defining the function whose code is to be generated
-	Takes as input an array of floats. By convention, the first parameter is the value for comparison, the second parameter is the size of the input array, 
-	the following parameters are the input array and then there is a set of empty records of the same size as the input array, for storing the results...**/
+	Takes as input an array of floats. By convention, the first item is the value for comparison, the second item is the size of  		the input array or number of tuples, the  third the number of threads. The next 2*number of threads spaces are used by the 		generator. The following number of tuples items are the input, and the last number of tuples items are where the output will 		be stored. 
+	In this way we pack both the input and the needed memory to be allocated. It is generated in the preceeding part of the code, 		which is defined in the dsl api ...**/
 
 	def snippet(input: Rep[Array[Float]]) = comment("Scan Variants- timer goes here", verbose = true) {
 
@@ -149,8 +138,7 @@ class ScanVariantsTests extends TutorialFunSuite {
 		var outputPos: this.Variable[Int]=0 //Definition of the output position, relative to number of hits.
 	
 
-		/*For ease of work, and after observing some unexpected typing issues (and forward references problems), we decided to place here the definition of 
-		the loop classes, in charge of handling the application of the variants.*/
+		/*For ease of work, and after observing some unexpected typing issues (and forward references problems), we decided 			to place here the definition of the loop classes, in charge of handling the application of the variants.*/
 
 		/**Definition of the Abstract Loop Representation class, in charge of handling the application of the variants. */
 		abstract class AbstractLoopRepresentation {
@@ -241,12 +229,7 @@ class ScanVariantsTests extends TutorialFunSuite {
 					}
 
 					//Serial assignment of output positions...
-/*List of limitations observed:
-Its not possible to do multiple assignments to a position in an Array of Rep: they dont show.
-We cannot use a Rep as a counter, because it doesnt get processed in the end
-We cannot cast a RepInt to a VarInt, but the other way around is ok.
-we can only assign a value to a RepInt.  
-*/					
+			
 					if (threadsDisplacement>0){
 						input(3+threadsDisplacement)=varIntToRepInt(zero).asInstanceOf[Rep[Float]];
 						for (k <- (1 until numThreads): Rep[Range]) {
@@ -270,6 +253,7 @@ we can only assign a value to a RepInt.
         		//			}
 			//		}		
 			//	}
+
 				/*Code generation for a non-optimized loop with the residual iterations after unrolling*/
 				if (this.unrolled){
 				        	if((numIterationsUnrolled*numInst)<maxNumIt){
@@ -357,7 +341,7 @@ we can only assign a value to a RepInt.
 			}//End of def runParallelPrefixSum
 
 
-			/*Function that counts the outputs of a thread.
+			/*Function that performs the parallel processing of a thread.
 			Takes as input the thread number.
 			It handles mapping from thread number to iteration number to input & output arrays, considering variants performed.*/
 			def runParallelChunk(it: Rep[Int])= comment("parallel chunk", verbose = true){
