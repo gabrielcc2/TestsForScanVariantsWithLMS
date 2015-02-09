@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
   }
   printf("Usage: filename numberOfTuples compareValue numThreads\n");
   printf("If the operator is not parallelized, please pass numThreads=0\n");
+  printf("If the operator is parallelized and numThreads=0, it will result in errors.\n");
   FILE *ptr_file;
   char buf[1000];
   int numTuples=atoi(argv[2]);
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
   }
   fclose(ptr_file);
   if (numReadTuples<numTuples){
+    printf("Error, file contains less tuples than specified.\n");
     return 0;
   }
   Scan(array);
@@ -69,10 +71,6 @@ void Scan(float*  x0) {
   int32_t x3 = 3;
   int32_t x4 = 0;
   pthread_t threads[(int)x7];
-  pthread_attr_t attr;
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  void* status;
   int *inputArray;
   inputArray=(int*)malloc(x7*sizeof(int));
   void* parallelPrefixSum(void* input){
@@ -87,21 +85,19 @@ void Scan(float*  x0) {
       int32_t x18 = x13 + x17;
       int32_t x19 = x15 + x18;
       float x20 = x0[x19];
-      bool x21 = x20 <= x6;
+      bool x21 = x20 >= x6;
       x10 += x21;
     }
     int32_t x26 = x10;
     x0[x25] = x26;
     //#parallel prefix sum
-    pthread_exit(NULL);
   }
   for(int x9=0; x9 < x7; x9++) {
 	inputArray[x9]=x9;
-	pthread_create(&threads[x9], &attr, parallelPrefixSum, (void *)&inputArray[x9]);
+	pthread_create(&threads[x9], NULL, parallelPrefixSum, (void *)&inputArray[x9]);
   }
   for(int x9=0; x9 < x7; x9++) {
-	int rc=pthread_join(threads[x9], &status);
-	printf("Main: completed join with thread %d having a status of %d\n",x9,rc);
+	pthread_join(threads[x9], NULL);
   }
   if (x32) {
     int32_t x33 = 3 + x7;
@@ -144,18 +140,16 @@ void Scan(float*  x0) {
       int32_t x63 = x15 + x62;
       float x72 = x0[x63];
       x0[x71] = x72;
-      bool x74 = x72 <= x6;
+      bool x74 = x72 >= x6;
       x56 += x74;
     }
     //#parallel chunk
-    pthread_exit(NULL);
   }
   for(int x55=0; x55 < x7; x55++) {
-  	pthread_create(&threads[x55], &attr, parallelChunk, (void *)&inputArray[x55]);
+  	pthread_create(&threads[x55], NULL, parallelChunk, (void *)&inputArray[x55]);
   }
   for(int x55=0; x55 < x7; x55++) {
-	int rc=pthread_join(threads[x55], &status);
-	printf("Main: completed join with thread %d having a status of %d\n",x55,rc);
+	pthread_join(threads[x55], NULL);
   }
   printf("%s\n","Output array: ");
   int32_t x83 = x4;
@@ -165,6 +159,11 @@ void Scan(float*  x0) {
     int32_t x88 = x87 + x5;
     float x89 = x0[x88];
     printf("%f\n",x89);
+  }
+  bool x93 = x83 == 0;
+  if (x93) {
+    printf("%s\n","No results found.");
+  } else {
   }
   //#Scan Variants- timer goes here
 }

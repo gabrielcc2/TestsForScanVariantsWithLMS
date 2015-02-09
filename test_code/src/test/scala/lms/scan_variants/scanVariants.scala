@@ -74,19 +74,19 @@ class ScanVariantsTests extends TutorialFunSuite {
    /*Configuration for the variants to be applied*/
    var numInstructionsForUnrolling: Int=4;
    var instructions = new Array[String](numInstructionsForUnrolling); 
-   instructions(0) = "_";//Remove branching  
+   instructions(0) = "Remove branching";//Remove branching  
    instructions(1) = "Unroll"; //"Unroll"; 
-   instructions(2) = "_";//"Parallelize"; 
+   instructions(2) = "Parallelize";//"Parallelize"; 
    instructions(3) = "_";//"Vectorize";
-   var unrollDepth: Int=5
+   var unrollDepth: Int=4
    var vectorSize: Int=4
 
    /*Configuration for the predicate*/
    val equals = false;
    val greaterThan=false;
-   val greaterThanEquals=false;
+   val greaterThanEquals=true;
    val lesserThan=false;
-   val lesserThanEquals=true;
+   val lesserThanEquals=false;
    val notEqual=false;
 
    var predicate: String ="scan_all";

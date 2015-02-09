@@ -266,7 +266,8 @@ int main(int argc, char *argv[])
 
   fclose(ptr_file);
   if (numReadTuples<numTuples){
-    return 0;
+     printf("Error, file contains less tuples than specified.\n");
+     return 0;
   }
   Scan(array);
   return 1;

@@ -1,6 +1,6 @@
 #Successful Tests
-#Sun Feb 08 02:52:57 CET 2015
-scala.lms.scan_variants.ScanVariantsTests=1423360377634
+#Mon Feb 09 19:13:03 CET 2015
+scala.lms.scan_variants.ScanVariantsTests=1423505582997
 scala.lms.tutorial.GettingStartedTest=1422481312722
 scala.lms.tutorial.DynVarWarmupTest=1422433374645
 scala.lms.tutorial.ScannerLibTest=1422481307704

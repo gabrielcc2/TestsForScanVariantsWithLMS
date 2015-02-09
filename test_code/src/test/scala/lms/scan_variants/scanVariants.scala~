@@ -76,17 +76,17 @@ class ScanVariantsTests extends TutorialFunSuite {
    var instructions = new Array[String](numInstructionsForUnrolling); 
    instructions(0) = "_";//Remove branching  
    instructions(1) = "Unroll"; //"Unroll"; 
-   instructions(2) = "_";//"Parallelize"; 
+   instructions(2) = "Parallelize";//"Parallelize"; 
    instructions(3) = "_";//"Vectorize";
-   var unrollDepth: Int=5
+   var unrollDepth: Int=4
    var vectorSize: Int=4
 
    /*Configuration for the predicate*/
    val equals = false;
    val greaterThan=false;
-   val greaterThanEquals=false;
+   val greaterThanEquals=true;
    val lesserThan=false;
-   val lesserThanEquals=true;
+   val lesserThanEquals=false;
    val notEqual=false;
 
    var predicate: String ="scan_all";
@@ -626,9 +626,13 @@ class ScanVariantsTests extends TutorialFunSuite {
     }//End of use of DSL driver
 
     check("ScanVariants_"+predicate, snippet.code, "c")     /*The naming scheme can be modified in this line*/
-   
+
+   /*Post-processing of the generated file so as to include Vectorization and Parallelization functions*/   
    var fileLines = io.Source.fromFile("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c").getLines.toList
-   if(fileLines.filter(x=>x.contains("x0[2]")).length>0){
+   
+   /*We check if the code was parallelized, by seeing if it has as input the number of threads and if it has loops that
+   use this number as limit for the iteration space (this is a characteristic exclusive to code that uses parallelization)*/
+   if(fileLines.filter(x=>x.contains("x0[2]")).length>0){ 
 	   val numThreadsLine=fileLines.filter(x=>x.contains("x0[2]")).head;
    	   var arrayOfSplitting: Array[java.lang.String] = numThreadsLine.split(" ")
    val numThreadsIdentifier=arrayOfSplitting(3)
@@ -767,13 +771,16 @@ class ScanVariantsTests extends TutorialFunSuite {
 		else{
 			outputList=outputList:+(str)
 		}
-	}	
+	}
+
+	/*We write back to the file*/	
 	val pw = new PrintWriter(new File("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c"))
 	for (str<- outputList){
 		pw.write(str+"\n");
 	}
 	pw.close();
    }}
+
   } //End of test "Scan Variants"
 } //End of class ScanVariantsTest
 
