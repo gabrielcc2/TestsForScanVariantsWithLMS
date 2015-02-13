@@ -49,7 +49,8 @@ Upcoming work:
 
 - Check if it's perhaps better to generate a parallelization at specific thread number instead of passing this as parameter. Change accordingly.
 
-- Complete remaining variants: Vectorization
+- Complete remaining variants: Vectorization, by defining staged operators as seen in: https://github.com/TiarkRompf/virtualization-lms-core/blob/develop/src/common/BooleanOps.scala.
+
 - Re-test
 - Clean generators code.
 - Study how to further clean the generated code.
@@ -60,6 +61,7 @@ Optional work for deployment:
 - Embed generator in cleaner function, taking input from console, so as to be usable by an existing system.
 - Design and apply a clear scheme for naming the generated codes according to variants used, or to other requirements from existing system.
 - Extend this to generate code for vectors of ints and other types of data (so far only float is supported).
+- Generate parallelism not through post-processing but through defining staged operators and emitting a function (https://github.com/TiarkRompf/virtualization-lms-core/blob/develop/src/common/Functions.scala), albeit inlined at call site. Perhaps a workaround for this inlining issue could be implemented, so as to make the generated accepted by more compilers.
 - ...
 
 Ideas for Future Work:
