@@ -1,10 +1,10 @@
 # TestsForScanVariantsWithLMS
 
-In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (provided in the LMS tutorials site, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. Basically we are trying to study how code generation could be carried out for loop unrolling, branch free code, vectorization using the X86 instructions and parallelization using phthreads.
+In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (https://github.com/scala-lms/tutorials/blob/master/src/test/scala/lms/tutorial/dslapi.scala, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. We are specifically studying how code generation could be carried out for loop unrolling, branch free code, vectorization (using the X86 instructions), parallelization (using phthreads) and their combinations.
 
 Vectorization is still not included in this release.
 
-Support for thread parallelism has worked so far by post-processing generated code, and not by modifications to the DSL api or LMS.
+Support for thread parallelism has worked so far by post-processing generated code, and not by defining new staged-operators in the LMS library.
 
 To run the code you need first to install the scala build tool: sbt.
 
@@ -12,7 +12,7 @@ Then go to the virtualization folder and call sbt publish-local.
 
 Now navigate to the test-code folder and call the same instruction. 
 
-Next, within this folder you can call sbt test. This compiles and runs the test_code/src/test/scala/lms/scan_variants/scanVariants.scala file, which generates C code according to in-file parameters. These can be changed according to user demands.
+Next, within this folder you can call sbt test. This compiles and runs the test_code/src/test/scala/lms/scan_variants/scanVariants.scala file, which generates C code according to in-file parameters. These can be changed by the user.
 
 The resulting C code can be found in test_code/src/out.
 
@@ -20,9 +20,9 @@ To run it you need a file consisting or a list of floats.
 
 To compile use gcc with options -std=c99 -pthread 
 
-(Note that G++ doesnt accept our parallel code, since we do a definition of functions from within another functions. This was our decision so as to allow the new functions to access local variables. 
+(Note that G++ doesnt accept our parallel code, since it doesn't support defining funtions within another functions. Doing this was our decision so as to allow the new functions to access local variables. 
 
-To change this would require a more elaborate post-processing scheme than the one we've developed.)
+To change this would require a more elaborate post-processing scheme than the one we've developed so far.)
 
 To run the C program you pass as input, in the command line: fileName numTuples compareValue numThreads. If not parallelized, numThreads should be 0. If parallelized, numThreads should start at 1.
 
@@ -48,6 +48,7 @@ Upcoming work:
 - Correct, if any, issues with behaviour at limits.
 
 - Check if it's perhaps better to generate a parallelization at specific thread number instead of passing this as parameter. Change accordingly.
+
 - Complete remaining variants: Vectorization
 - Re-test
 - Clean generators code.
@@ -58,5 +59,8 @@ Upcoming work:
 Optional work for deployment:
 - Embed generator in cleaner function, taking input from console, so as to be usable by an existing system.
 - Design and apply a clear scheme for naming the generated codes according to variants used, or to other requirements from existing system.
-- Create copies of this that generate code for vectors of ints and other types of data (so far only float is supported).
+- Extend this to generate code for vectors of ints and other types of data (so far only float is supported).
 - ...
+
+Ideas for Future Work:
+- Consider alternatives for generating the parallel code, such as using the Delite framework (http://stanford-ppl.github.io/Delite/).
