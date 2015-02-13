@@ -1,8 +1,10 @@
 # TestsForScanVariantsWithLMS
 
-In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (provided in the LMS tutorials site, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. Basically we are trying to study how code generation could be carried out for loop unrolling, branch free code, vectorization and parallelization using phthreads.
+In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (provided in the LMS tutorials site, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. Basically we are trying to study how code generation could be carried out for loop unrolling, branch free code, vectorization using the X86 instructions and parallelization using phthreads.
 
 Vectorization is still not included in this release.
+
+Support for thread parallelism has worked so far by post-processing generated code, and not by modifications to the DSL api or LMS.
 
 To run the code you need first to install the scala build tool: sbt.
 
