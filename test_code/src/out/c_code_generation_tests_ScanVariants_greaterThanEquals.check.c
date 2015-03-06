@@ -16,8 +16,6 @@ int main(int argc, char *argv[])
     return 0;
   }
   printf("Usage: filename numberOfTuples compareValue numThreads\n");
-  printf("If the operator is not parallelized, please pass numThreads=0\n");
-  printf("If the operator is parallelized and numThreads=0, it will result in errors.\n");
   FILE *ptr_file;
   char buf[1000];
   int numTuples=atoi(argv[2]);
@@ -26,6 +24,14 @@ int main(int argc, char *argv[])
   int numReadTuples=0;
   ptr_file =fopen(argv[1],"r");
   if (!ptr_file){
+    return 0;
+  }
+  if (numTuples<=0){
+    printf("Error. Please pass a valid number of tuples.\n");
+    return 0;
+  }
+  if (numThreads<=0){
+    printf("Error. Please pass a valid number of threads.\n");
     return 0;
   }
   float *array;
@@ -56,173 +62,188 @@ Emitting C Generated Code
 #include <string.h>
 #include <stdbool.h>
 void Scan(float*  x0) {
-  float x8 = x0[2];
-  float x5 = x0[1];
-  int32_t x7 = x5 / 4;
-  float x12 = x7 / x8;
-  float x6 = x0[0];
-  int32_t x15 = 2 * x8;
-  int32_t x16 = 3 + x15;
-  int32_t x25 = x16 + 1;
-  int32_t x30 = x16 + 2;
-  int32_t x35 = x16 + 3;
-  bool x49 = x8 > 0;
-  int32_t x74 = x7 / x8;
-  int32_t x121 = x7 * 4;
-  bool x122 = x121 < x5;
+  float x6 = x0[2];
+  float x3 = x0[1];
+  int32_t x5 = x3 / 4;
+  float x16 = x5 / x6;
+  float x4 = x0[0];
+  int32_t x10 = 2 * x6;
+  int32_t x11 = 3 + x10;
+  bool x46 = x6 > 0;
+  int32_t x72 = x5 / x6;
+  int32_t x95 = x11 + 1;
+  int32_t x106 = x11 + 2;
+  int32_t x117 = x11 + 3;
+  int32_t x134 = x5 * 4;
+  bool x135 = x134 < x3;
+  int32_t x162 = x11 + x3;
   //#Scan Variants- timer goes here
   // generated code for Scan Variants- timer goes here
   int32_t x1 = 0;
-  int32_t x2 = 1;
-  int32_t x3 = 3;
-  int32_t x4 = 0;
-  pthread_t threads[(int)x8];
+  int32_t x2 = 0;
+  pthread_t threads[(int)x6];
   int *inputArray;
-  inputArray=(int*)malloc(x8*sizeof(int));
+  inputArray=(int*)malloc(x6*sizeof(int));
   void* parallelPrefixSum(void* input){
-    int x10=*(int*)input;
-    int32_t x17 = x10 * x7;
-    int32_t x18 = x17 / x8;
-    int32_t x42 = 3 + x10;
+    int x8=*(int*)input;
+    int32_t x12 = x8 * x5;
+    int32_t x13 = x12 / x6;
+    int32_t x14 = x13 * 4;
+    int32_t x15 = x11 + x14;
+    int32_t x39 = 3 + x8;
     //#parallel prefix sum
     // generated code for parallel prefix sum
-    int32_t x11 = 0;
-    for(int x14=0; x14 < x12; x14++) {
-      int32_t x19 = x14 + x18;
-      int32_t x20 = x19 * 4;
-      int32_t x21 = x16 + x20;
-      float x22 = x0[x21];
-      bool x23 = x22 >= x6;
-      x11 += x23;
-      int32_t x26 = x25 + x20;
-      float x27 = x0[x26];
-      bool x28 = x27 >= x6;
-      x11 += x28;
-      int32_t x31 = x30 + x20;
-      float x32 = x0[x31];
-      bool x33 = x32 >= x6;
-      x11 += x33;
-      int32_t x36 = x35 + x20;
-      float x37 = x0[x36];
-      bool x38 = x37 >= x6;
-      x11 += x38;
+    int32_t x9 = 0;
+    for(int x18=0; x18 < x16; x18++) {
+      int32_t x19 = x18 * 4;
+      int32_t x20 = x15 + x19;
+      float x21 = x0[x20];
+      bool x22 = x21 >= x4;
+      x9 += x22;
+      int32_t x24 = x20 + 1;
+      float x25 = x0[x24];
+      bool x26 = x25 >= x4;
+      x9 += x26;
+      int32_t x28 = x24 + 1;
+      float x29 = x0[x28];
+      bool x30 = x29 >= x4;
+      x9 += x30;
+      int32_t x32 = x28 + 1;
+      float x33 = x0[x32];
+      bool x34 = x33 >= x4;
+      x9 += x34;
     }
-    int32_t x43 = x11;
-    x0[x42] = x43;
+    int32_t x40 = x9;
+    x0[x39] = x40;
     //#parallel prefix sum
   }
-  for(int x10=0; x10 < x8; x10++) {
-	inputArray[x10]=x10;
-	pthread_create(&threads[x10], NULL, parallelPrefixSum, (void *)&inputArray[x10]);
+  for(int x8=0; x8 < x6; x8++) {
+	inputArray[x8]=x8;
+	pthread_create(&threads[x8], NULL, parallelPrefixSum, (void *)&inputArray[x8]);
   }
-  for(int x10=0; x10 < x8; x10++) {
-	pthread_join(threads[x10], NULL);
+  for(int x8=0; x8 < x6; x8++) {
+	pthread_join(threads[x8], NULL);
   }
-  if (x49) {
-    int32_t x50 = 3 + x8;
-    x0[x50] = 0;
-    for(int x53=1; x53 < x8; x53++) {
-      int32_t x54 = 3 + x53;
-      int32_t x55 = x54 + x8;
-      int32_t x56 = x54 - 1;
-      float x57 = x0[x56];
-      int32_t x58 = x56 + x8;
-      float x59 = x0[x58];
-      float x60 = x57 + x59;
-      x0[x55] = x60;
+  if (x46) {
+    int32_t x47 = 3 + x6;
+    x0[x47] = 0;
+    for(int x50=1; x50 < x6; x50++) {
+      int32_t x51 = x47 + x50;
+      int32_t x52 = 3 + x50;
+      int32_t x53 = x52 - 1;
+      float x54 = x0[x53];
+      int32_t x55 = x51 - 1;
+      float x56 = x0[x55];
+      float x57 = x54 + x56;
+      x0[x51] = x57;
     }
-    int32_t x64 = x50 - 1;
-    float x65 = x0[x64];
-    int32_t x66 = x64 + x8;
-    float x67 = x0[x66];
-    float x68 = x65 + x67;
-    x4 = x68;
+    int32_t x61 = x47 - 1;
+    float x62 = x0[x61];
+    int32_t x63 = x61 + x6;
+    float x64 = x0[x63];
+    float x65 = x62 + x64;
+    x2 = x65;
   } else {
   }
   void* parallelChunk(void* input){
-    int x72=*(int*)input;
-    int32_t x82 = 3 + x72;
-    int32_t x83 = x82 + x8;
-    float x84 = x0[x83];
-    int32_t x85 = x84 + 3;
-    int32_t x86 = x85 + x15;
-    int32_t x87 = x86 + x5;
-    int32_t x77 = x72 * x7;
-    int32_t x78 = x77 / x8;
+    int x69=*(int*)input;
+    int32_t x81 = 3 + x69;
+    int32_t x82 = x81 + x6;
+    float x83 = x0[x82];
+    int32_t x84 = x83 + 3;
+    int32_t x85 = x84 + x10;
+    int32_t x86 = x85 + x3;
+    int32_t x76 = x69 * x5;
+    int32_t x77 = x76 / x6;
     //#parallel chunk
     // generated code for parallel chunk
-    int32_t x73 = 0;
-    for(int x76=0; x76 < x74; x76++) {
-      int32_t x88 = x73;
-      int32_t x89 = x87 + x88;
-      int32_t x79 = x76 + x78;
-      int32_t x80 = x79 * 4;
-      int32_t x81 = x16 + x80;
-      float x90 = x0[x81];
-      x0[x89] = x90;
-      bool x92 = x90 >= x6;
-      x73 += x92;
-      int32_t x95 = x73;
-      int32_t x96 = x87 + x95;
-      int32_t x94 = x25 + x80;
-      float x97 = x0[x94];
-      x0[x96] = x97;
-      bool x99 = x97 >= x6;
-      x73 += x99;
-      int32_t x102 = x73;
-      int32_t x103 = x87 + x102;
-      int32_t x101 = x30 + x80;
-      float x104 = x0[x101];
-      x0[x103] = x104;
-      bool x106 = x104 >= x6;
-      x73 += x106;
-      int32_t x109 = x73;
-      int32_t x110 = x87 + x109;
-      int32_t x108 = x35 + x80;
-      float x111 = x0[x108];
-      x0[x110] = x111;
-      bool x113 = x111 >= x6;
-      x73 += x113;
+    int32_t x70 = 0;
+    int32_t x71 = 0;
+    for(int x74=0; x74 < x72; x74++) {
+      x71 += 0;
+      int32_t x87 = x70;
+      int32_t x88 = x86 + x87;
+      int32_t x78 = x74 + x77;
+      int32_t x79 = x78 * 4;
+      int32_t x80 = x11 + x79;
+      int32_t x89 = x80 - 3;
+      int32_t x90 = x89 - x10;
+      x0[x88] = x90;
+      float x92 = x0[x80];
+      bool x93 = x92 >= x4;
+      x70 += x93;
+      x71 += 1;
+      int32_t x98 = x70;
+      int32_t x99 = x86 + x98;
+      int32_t x97 = x95 + x79;
+      int32_t x100 = x97 - 3;
+      int32_t x101 = x100 - x10;
+      x0[x99] = x101;
+      float x103 = x0[x97];
+      bool x104 = x103 >= x4;
+      x70 += x104;
+      x71 += 2;
+      int32_t x109 = x70;
+      int32_t x110 = x86 + x109;
+      int32_t x108 = x106 + x79;
+      int32_t x111 = x108 - 3;
+      int32_t x112 = x111 - x10;
+      x0[x110] = x112;
+      float x114 = x0[x108];
+      bool x115 = x114 >= x4;
+      x70 += x115;
+      x71 += 3;
+      int32_t x120 = x70;
+      int32_t x121 = x86 + x120;
+      int32_t x119 = x117 + x79;
+      int32_t x122 = x119 - 3;
+      int32_t x123 = x122 - x10;
+      x0[x121] = x123;
+      float x125 = x0[x119];
+      bool x126 = x125 >= x4;
+      x70 += x126;
     }
     //#parallel chunk
   }
-  for(int x72=0; x72 < x8; x72++) {
-  	pthread_create(&threads[x72], NULL, parallelChunk, (void *)&inputArray[x72]);
+  for(int x69=0; x69 < x6; x69++) {
+  	pthread_create(&threads[x69], NULL, parallelChunk, (void *)&inputArray[x69]);
   }
-  for(int x72=0; x72 < x8; x72++) {
-	pthread_join(threads[x72], NULL);
+  for(int x69=0; x69 < x6; x69++) {
+	pthread_join(threads[x69], NULL);
   }
-  if (x122) {
-    int32_t x123 = x121 + 3;
-    int32_t x124 = x123 + x15;
-    int32_t x125 = x5 + 3;
-    int32_t x126 = x125 + x15;
-    for(int x128=x124; x128 < x126; x128++) {
-      float x133 = x0[x128];
-      bool x135 = x133 >= x6;
+  if (x135) {
+    int32_t x136 = x134 + 3;
+    int32_t x137 = x136 + x10;
+    int32_t x138 = x3 + 3;
+    int32_t x139 = x138 + x10;
+    for(int x141=x137; x141 < x139; x141++) {
+      int32_t x146 = x141 - 3;
+      int32_t x147 = x146 - x10;
+      float x149 = x0[x141];
+      bool x150 = x149 >= x4;
       //#run residue instructions after unroll
       // generated code for run residue instructions after unroll
-      int32_t x129 = x4;
-      int32_t x130 = x129 + x5;
-      int32_t x131 = x130 + x15;
-      int32_t x132 = x131 + 3;
-      x0[x132] = x133;
-      x4 += x135;
+      int32_t x142 = x2;
+      int32_t x143 = x142 + x3;
+      int32_t x144 = x143 + x10;
+      int32_t x145 = x144 + 3;
+      x0[x145] = x147;
+      x2 += x150;
       //#run residue instructions after unroll
     }
   } else {
   }
+  printf("%s\n","Number of tuples: ");
+  int32_t x159 = x2;
+  printf("%d\n",x159);
   printf("%s\n","Output array: ");
-  int32_t x144 = x4;
-  for(int x146=0; x146 < x144; x146++) {
-    int32_t x147 = x146 + 3;
-    int32_t x148 = x147 + x15;
-    int32_t x149 = x148 + x5;
-    float x150 = x0[x149];
-    printf("%f\n",x150);
+  for(int x164=0; x164 < x159; x164++) {
+    int32_t x165 = x164 + x162;
+    float x166 = x0[x165];
+    printf("%f\n",x166);
   }
-  bool x154 = x144 == 0;
-  if (x154) {
+  bool x170 = x159 == 0;
+  if (x170) {
     printf("%s\n","No results found.");
   } else {
   }
