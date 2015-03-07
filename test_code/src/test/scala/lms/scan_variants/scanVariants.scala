@@ -116,7 +116,7 @@ class ScanVariantsTests extends TutorialFunSuite {
 	    
     		/*Definition of the Abstract Loop Representation class, in charge of handling the application of the variants. */
     		abstract class AbstractLoopRepresentation {
-    	
+    		  
     			/*Attributes*/
     			var numIterations: Exp[Any] =_ //Number of interations of original loop
     			var value: Exp[Any] =_ //Value for comparison
@@ -178,7 +178,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     			    	case "Remove branching" => bfc=true 
     			    	case "Unroll" => {
     			    		unrolled=true
-    			    		numIterationsUnrolled=(numIterationsUnrolled/unrollDepth).asInstanceOf[Rep[Int]]
+    			    		numIterationsUnrolled=((numIterationsUnrolled).asInstanceOf[Rep[Float]]/unrollDepth).asInstanceOf[Rep[Int]]
     			    		numInst=(numInst*(unrollDepth.asInstanceOf[Int]))
     			    	}
     			    	case "Parallelize" => {
@@ -219,26 +219,24 @@ class ScanVariantsTests extends TutorialFunSuite {
     				  }
     			  }
 
-    			  /*Code generation for a non-optimized loop with the residual iterations after unrolling and incomplete parallelization*/
-    			 // if (this.unrolled && this.parallelized){
-    			 // }	  
-    			  /*Code generation for a non-optimized loop with the residual iterations after incomplete parallelization*/
-    			  //else if (this.parallelized){
-    			  //		        	if(((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*numInst*numThreads)<maxNumIt){
-    			  //					for (i <- ( (((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*numInst*numThreads)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
-    			  //      			  		this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
-    			  //			}
-    			  //		}		
-    			  //	}
     			  /*Code generation for a non-optimized loop with the residual iterations after unrolling*/
-    			  if (this.unrolled){
-    			    //Should be else if
+    			  if (this.unrolled && !this.parallelized){
     			      var tempVal2:Rep[Int]= numIterationsUnrolled*numInst
-    				  if((tempVal2)<maxNumIt){
+    				  if(tempVal2<maxNumIt){
     					  for (i <- ( ((tempVal2)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
     						  this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
     					  }
     				  }		
+    			  }   
+    			  /**Code generation for the residual iterations after parallelizing*/
+    			  else if (this.parallelized){
+    			      var tempVal2:Rep[Int]= (numIterationsUnrolled/numThreads)*numInst*numThreads.asInstanceOf[Rep[Int]]
+    				  if(tempVal2<maxNumIt){
+    					  for (i <- ( ((tempVal2)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
+    						  this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
+    					  }
+    				  }
+
     			  }
     			} //End of run loop function.
 	
@@ -248,8 +246,8 @@ class ScanVariantsTests extends TutorialFunSuite {
     			 * considering variants performed.**/
     			def runParallelPrefixSum(it:Rep[Int])= comment("parallel prefix sum", verbose = true){
     				var count: Variable[Int] = 0
-    				var baseVal: Rep[Int]= 3+(2*numThreads)+(it*numIterationsUnrolled/numThreads)*numInst
-    				for (i <- (0 until (numIterationsUnrolled.asInstanceOf[Rep[Float]]/(numThreads).asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]): Rep[Range]) {
+    				var baseVal: Rep[Int]= 3+(2*numThreads)+numInst*((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*it)
+    				for (i <- (0 until (numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
     					var currInst:Int=0
     					var itVal:Rep[Int]=baseVal+(i*numInst)
     					while (currInst<numInst){
@@ -264,7 +262,24 @@ class ScanVariantsTests extends TutorialFunSuite {
     						currInst+=1
     						itVal+=1;
     					} //End of while loop
-    				}//End of for loop    				
+    				}//End of for loop
+    				
+    				//Residue
+    				/**var tempVal2:Rep[Int]= numIterationsUnrolled*numInst
+    				  if((tempVal2)<maxNumIt){
+    					  for (i <- ( ((tempVal2)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
+    						  this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
+    					  }
+    				  }	
+    				
+    				if (){
+    				  
+    				}*/
+    				
+    				//If something related to number of iterations unrolled 
+    				//We process them in residue (check that residue works for them)
+    				//We continue...
+    				
     				input(3+it)=varIntToRepInt(count).asInstanceOf[Rep[Float]] //We store the size of output array before returning.		
     			}//End of def runParallelPrefixSum
     			
@@ -274,14 +289,12 @@ class ScanVariantsTests extends TutorialFunSuite {
     			 * considering variants performed.**/
     			def runParallelChunk(it: Rep[Int])= comment("parallel chunk", verbose = true){
     				var count: Variable[Int] = 0
-    				var relPos: Variable[Int]=0
-    				for (i <- (0 until numIterationsUnrolled/numThreads): Rep[Range]) {
+    				for (i <- (0 until (numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
     					var currInst:Int=0
     					while (currInst<numInst){
     						var itVal:Rep[Int]=3+(2*numThreads)
     						itVal+=currInst
-    						relPos+=currInst
-    						itVal+=((i+(it*numIterationsUnrolled/numThreads))*numInst)
+    						itVal+=((i+((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*it))*numInst)
     						
     						if (bfc){//Branch-free code
     							input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+3+(2*numThreads)+maxNumIt+varIntToRepInt(count))=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
@@ -295,7 +308,10 @@ class ScanVariantsTests extends TutorialFunSuite {
     						}
     						currInst+=1
     					} //End of while loop
-    				}//End of for loop		
+    				}//End of for loop
+    				
+    				//Residue
+    				
     			}//End of def runParallelChunk
     			
     			/**Function that defines the series of instructions to be executed in one iteration of the resulting loop.
@@ -432,7 +448,7 @@ class ScanVariantsTests extends TutorialFunSuite {
 	        			outputList=outputList:+("void Scan(float*);")
 	        			outputList=outputList:+("int main(int argc, char *argv[])")
 	        			outputList=outputList:+("{")
-	        			outputList=outputList:+("  if (argc < 4) {")
+	        			outputList=outputList:+("  if (argc < 5) {")
 	        			outputList=outputList:+("    printf(\"Missing arguments. Usage: filename numberOfTuples compareValue numThreads\\n\");")
 	        			outputList=outputList:+("    return 0;")
 	        			outputList=outputList:+("  }")

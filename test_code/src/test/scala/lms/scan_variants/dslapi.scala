@@ -227,7 +227,7 @@ trait DslGenC extends CGenNumericOps
 void Scan(float*);
 int main(int argc, char *argv[])
 {
-  if (argc < 3) {
+  if (argc < 4) {
     printf("Missing arguments. Usage: filename numberOfTuples compareValue\n");
     return 0;
   }

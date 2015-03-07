@@ -31,18 +31,18 @@ and other institutions.
 Notes on variants applied:
 
 	BRANCH REMOVAL: Only one call of remove branching is effectful. More calls dont add anything new to the execution.
-	A scheme for branch removal only on selected threads could be supported, but we're not sure on the uses/benefits of this.
 
 	LOOP UNROLLING: Loop unrolling can be added up. If there is an attempt to use an unrolled loop beyond, but passing less tuples
-        than there are instructions in one unrolled iteraton, then the whole loop will run regularly in a section defined as the residue of the unrolling. 
+    than there are instructions in one unrolled iteraton, then the whole loop will run regularly in a section defined as the residue of the unrolling. 
 
-	PARALLELIZATION: As it is implemented, only one parallelization is defined, dividing the iterations among them. 
+	MULTI-CORE PARALLELIZATION: As it is implemented, only one parallelization is defined, dividing the iterations among them. 
 	Number of threads will be passed as parameter at run time.
 	Adding more threads than there are iterations will have no effect, and the loop will run unparallelized in the section defined as the residue
-        of the unrolling.
-	Later more types of parallelization could be explored, if there is an interest for this. 
+    of the unrolling.
 	
 	VECTORIZATION:?
+	
+	GPU PARALLELIZATION:
 
 *********************************************************************************************************************************************
 Working Notes:
@@ -64,732 +64,558 @@ import java.io.File
 
 
 class ScanVariantsTests extends TutorialFunSuite {
-
+  
   val under = "c_code_generation_tests_"
-
+  
   test("ScanVariants") {
-  
-   /**Future work: This should be embedded in a cleaner function, taking input from console, so as to be usable by an existing system. **/
-  
-   /*Configuration for the variants to be applied*/
-   var numInstructionsForUnrolling: Int=4;
-   var instructions = new Array[String](numInstructionsForUnrolling); 
-   instructions(0) = "Remove branching";//Remove branching  
-   instructions(1) = "Unroll"; //"Unroll"; 
-   instructions(2) = "Unroll";//Parallelize";//"Parallelize"; 
-   instructions(3) = "_";//"Vectorize";
-   var unrollDepth: Int=4
-   var vectorSize: Int=4
+    
+    /**Future work: This should be embedded in a cleaner function, taking input from console, so as to be usable by an existing system. **/
+    
+    /*Configuration for the variants to be applied*/
+    var numInstructionsForUnrolling: Int=4
+    var instructions = new Array[String](numInstructionsForUnrolling) 
+    instructions(0) = "Remove branching"//Remove branching  
+    instructions(1) = "Unroll" //"Unroll";
+    instructions(2) = "Parallelize"//Parallelize";//"Parallelize";
+    instructions(3) = "_"//"Vectorize";
+    
+    var unrollDepth: Int=4
+    var vectorSize: Int=4
+    
+    /**Configuration for the predicate
+     * Could be equals, greaterThan, greaterThanEquals, lesserThan, lesserThanEquals, notEquals.
+     * Anything else would mean scan all.**/    
+    var predicate: String = "greaterThanEquals" 
+    
+    						  
+    /*Definition of the snippet for code-generation, using a slightly modified version of EPFL's LMS DSL api for C-code generation*/		
+    val snippet = new DslDriverC[Array[Float],Unit] {
+    	
+    	/*Area where context is shared between 2 stages: the code-generation stage and the execution stage*/
+    	
+    	/**Snippet function defining the function whose code is to be generated
+    	 * Takes as input an array of floats. By convention, the first item is the value for comparison, the second item is the size of  		
+    	 * the input array or number of tuples, the  third the number of threads. The next 2*number of threads spaces are used by the 		
+    	 * generator. The following number of tuples items are the input, and the last number of tuples items are where the output will be stored. 
+    	 * In this way we pack both the input and the needed memory to be allocated. It is generated in the preceeding part of the code, 		
+    	 * which is defined in the dsl api ...**/
 
-   /*Configuration for the predicate*/
-   val equals = false;
-   val greaterThan=false;
-   val greaterThanEquals=true;
-   val lesserThan=false;
-   val lesserThanEquals=false;
-   val notEqual=false;
+    	def snippet(input: Rep[Array[Float]]) = comment("Scan Variants- timer goes here", verbose = true) {
+	    
+    		/*Input values*/
+    		lazy val valueForComparison:Rep[Float]=input(0) 
+	    	lazy val maxNumIt:Rep[Int]=input(1).asInstanceOf[this.Rep[Int]]
+    		lazy val numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]]
+	  
+    		/*Local context variables*/
+    		var zero: this.Variable[Int]=0 //Definition of number 0, for typing purposes.
+    		var outputPos: this.Variable[Int]=0 //Definition of the output position, relative to number of hits.
+	  
+    		/**For ease of work, and after observing some unexpected typing issues (and forward references problems), we decided 			
+    		 * to place here the definition of the loop classes, in charge of handling the application of the variants.*/
+	    
+    		/*Definition of the Abstract Loop Representation class, in charge of handling the application of the variants. */
+    		abstract class AbstractLoopRepresentation {
+    		  
+    			/*Attributes*/
+    			var numIterations: Exp[Any] =_ //Number of interations of original loop
+    			var value: Exp[Any] =_ //Value for comparison
+    			
+    			var bfc: Boolean=_//Flag to define if using branch-free-code. False by default.
+    			var unrolled: Boolean=_//Flag to define if loop has been unrolled. False by default.
+    			var parallelized: Boolean=_//Flag to define if loop has been parallelized. False by default.
+    			
+    			var numIterationsUnrolled: Rep[Int] =_ //Number of Iterations of unrolled loop
+    			var numThreads: Rep[Int] =_ //Number of threads
+    			var numInst: Int =_ //Number of instructions per iteration. 1 by default.
+    			
+    			/*Parametric constructor. Takes as input the number of iterations, compare value and predictate.*/
+    			def this (numIt: Rep[Int], compareValue: Rep[Float], pred:String){
+    				this()
+    				numIterations=numIt
+    				numIterationsUnrolled=numIt
+    				value=compareValue
+    				numThreads=varIntToRepInt(zero)
+    				numInst=1
+    				bfc=false
+    				unrolled=false
+    				parallelized=false
+    			}
+	    
+    			/*Some getters...*/
+    			def getNumIterations():Rep[Int]={
+    				numIterationsUnrolled
+    			}
+    			def getNumThreads():Rep[Int]={
+    				numThreads
+    			}
+    			def getNumInstructionsPerUnrolledIteration(): Int={
+    				numInst
+    			}
+    			def isUnrolled():Boolean={
+    				unrolled
+    			}
+    			def isParallelized():Boolean={
+    				parallelized
+    			}
+    			
+    			/*Function for evaluating specific predicates*/
+    			def eval (val1: Rep[Float], val2:Rep[Float]): Rep[Boolean] ={
+    				predicate match {
+    			    	case "equals" => val1==val2 
+    			    	case "greaterThan" => val1>val2 
+    			       	case "greaterThanEquals" => val1>=val2 
+    			      	case "lesserThan" =>  val1<val2
+    			       	case "lesserThanEquals" => val1<=val2 
+    			      	case "notEquals" =>  val1!=val2 
+    			      	case _ => true
+    			  }
+    			}
+	    
+    			/*Function in charge of applying variant changes to current loop configuration.*/
+    			def applyVariant(instruction: String){
+    				instruction match {
+    			    	case "Remove branching" => bfc=true 
+    			    	case "Unroll" => {
+    			    		unrolled=true
+    			    		numIterationsUnrolled=((numIterationsUnrolled).asInstanceOf[Rep[Float]]/unrollDepth).asInstanceOf[Rep[Int]]
+    			    		numInst=(numInst*(unrollDepth.asInstanceOf[Int]))
+    			    	}
+    			    	case "Parallelize" => {
+    			    		parallelized=true
+    			    		numThreads=numThreadsSelected
+    			    	}
+    			    	case _ =>{} //Do nothing... Added to keep with standards.
+    				}
+    			}
+    			
+    			/**runLoop: Function responsible for running the loop. 
+    			 * Parallelization changes can be handled from here.*/
+    			def runLoop(){
+    			  if (!parallelized){
+    				  /*Loop for code generation*/
+    				  for (i <- (0 until numIterationsUnrolled): Rep[Range]) {
+    					  this.runInstructionOfIteration(i)
+    				  }
+    			  }
+    			  else{
+    				  //Parallel prefix sum...
+    				  for (j <- (0 until numThreads): Rep[Range]) {
+    					  this.runParallelPrefixSum(j)//Should be done in parallel
+    				  }
 
-   var predicate: String ="scan_all";
+    				  //Serial assignment of output positions...
+    				  if (numThreads>0){
+    					  var tempVal:Rep[Int]=3+numThreads
+    					  input(tempVal)=varIntToRepInt(zero).asInstanceOf[Rep[Float]]
+    					  for (k <- (1 until numThreads): Rep[Range]) {
+    						  input(tempVal+k)=input(3+k-1)+input(tempVal+k-1)
+    					  }
+    					  outputPos=input(tempVal-1)+input(tempVal-1+numThreads)
+    				  }
+    				  //Parallel writing...					
+    				  for (l <- (0 until numThreads): Rep[Range]) {
+    					  this.runParallelChunk(l)//Should be done in parallel
+    				  }
+    			  }
 
-   if (equals){
-	predicate="equals";
-   }
-   else if (greaterThan){
-	predicate="greaterThan";
-   }
-   else if (greaterThanEquals){
-	predicate="greaterThanEquals";
-   }
-   else if (lesserThan){
-	predicate="lesserThan";
-   }
-   else if (lesserThanEquals){
-	predicate="lesserThanEquals";
-   }
-   else if (notEqual) {
-        predicate="notEquals";
-   }
-   else {
-        predicate="scan_all";
-   }
+    			  /*Code generation for a non-optimized loop with the residual iterations after unrolling*/
+    			  if (this.unrolled && !this.parallelized){
+    			      var tempVal2:Rep[Int]= numIterationsUnrolled*numInst
+    				  if(tempVal2<maxNumIt){
+    					  for (i <- ( ((tempVal2)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
+    						  this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
+    					  }
+    				  }		
+    			  }   
+    			  /**Code generation for the residual iterations after parallelizing*/
+    			  else if (this.parallelized){
+    			      var tempVal2:Rep[Int]= (numIterationsUnrolled/numThreads)*numInst*numThreads.asInstanceOf[Rep[Int]]
+    				  if(tempVal2<maxNumIt){
+    					  for (i <- ( ((tempVal2)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
+    						  this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
+    					  }
+    				  }
 
-
-   /*Definition of the snippet for code-generation, using a slightly modified version of EPFL's LMS DSL api for C-code generation*/		
-   val snippet = new DslDriverC[Array[Float],Unit] {
-
-	/*Area where context is shared between 2 stages: the code-generation stage and the execution stage*/
-
-
-	/*Snippet function defining the function whose code is to be generated
-	Takes as input an array of floats. By convention, the first item is the value for comparison, the second item is the size of  		the input array or number of tuples, the  third the number of threads. The next 2*number of threads spaces are used by the 		generator. The following number of tuples items are the input, and the last number of tuples items are where the output will 		be stored. 
-	In this way we pack both the input and the needed memory to be allocated. It is generated in the preceeding part of the code, 		which is defined in the dsl api ...**/
-
-	def snippet(input: Rep[Array[Float]]) = comment("Scan Variants- timer goes here", verbose = true) {
-
-		/*Input values*/
-  		lazy val valueForComparison:Rep[Float]=input(0); 
-		lazy val maxNumIt:Rep[Int]=input(1).asInstanceOf[this.Rep[Int]];
-		lazy val numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]];
+    			  }
+    			} //End of run loop function.
 	
-		/*Local context variables*/
-		var zero: this.Variable[Int]=0 //Definition of number 0, for typing purposes.
-		var one: this.Variable[Int]=1 //Definition of number 1, for typing purposes.
-		var three: this.Variable[Int]=3 //Definition of number 3, for typing purposes.
-		var outputPos: this.Variable[Int]=0 //Definition of the output position, relative to number of hits.
-	
+    			/**Function that counts the outputs of a thread.
+    			 * Takes as input the thread number.
+    			 * It handles mapping from thread number to iteration number to input & output arrays, 
+    			 * considering variants performed.**/
+    			def runParallelPrefixSum(it:Rep[Int])= comment("parallel prefix sum", verbose = true){
+    				var count: Variable[Int] = 0
+    				var baseVal: Rep[Int]= 3+(2*numThreads)+numInst*(((numIterationsUnrolled).asInstanceOf[Rep[Float]]/numThreads).asInstanceOf[Rep[Int]]*it)
+    				for (i <- (0 until (numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
+    					var currInst:Int=0
+    					var itVal:Rep[Int]=baseVal+(i*numInst)
+    					while (currInst<numInst){
+    						if (bfc){ //Branch-free code
+    							count+=this.eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
+    						}
+    						else {//Branching code
+     							if (this.eval(input(itVal),value.asInstanceOf[Rep[Float]])){
+    								count+=1				
+    							}
+    						}
+    						currInst+=1
+    						itVal+=1;
+    					} //End of while loop
+    				}//End of for loop
+    				
+    				//Residue
+    				/**var tempVal2:Rep[Int]= numIterationsUnrolled*numInst
+    				  if((tempVal2)<maxNumIt){
+    					  for (i <- ( ((tempVal2)+3+(2*numThreads)) until maxNumIt+3+(2*numThreads)): Rep[Range]) {
+    						  this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
+    					  }
+    				  }	
+    				
+    				if (){
+    				  
+    				}*/
+    				
+    				//If something related to number of iterations unrolled 
+    				//We process them in residue (check that residue works for them)
+    				//We continue...
+    				
+    				input(3+it)=varIntToRepInt(count).asInstanceOf[Rep[Float]] //We store the size of output array before returning.		
+    			}//End of def runParallelPrefixSum
+    			
+    			/**Function that performs the parallel processing of a thread.
+    			 * Takes as input the thread number.
+    			 * It handles mapping from thread number to iteration number to input & output arrays, 
+    			 * considering variants performed.**/
+    			def runParallelChunk(it: Rep[Int])= comment("parallel chunk", verbose = true){
+    				var count: Variable[Int] = 0
+    				for (i <- (0 until (numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
+    					var currInst:Int=0
+    					while (currInst<numInst){
+    						var itVal:Rep[Int]=3+(2*numThreads)
+    						itVal+=currInst
+    						itVal+=((i+((numIterationsUnrolled.asInstanceOf[Rep[Float]]/numThreads).asInstanceOf[Rep[Int]]*it))*numInst)
+    						
+    						if (bfc){//Branch-free code
+    							input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+3+(2*numThreads)+maxNumIt+varIntToRepInt(count))=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
+    							count+=this.eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
+    						}
+    						else{//Branching code
+    						  if (this.eval(input(itVal),value.asInstanceOf[Rep[Float]])){
+    							  input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+3+(2*numThreads)+maxNumIt+varIntToRepInt(count))=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
+    							  count+=1
+    						  }
+    						}
+    						currInst+=1
+    					} //End of while loop
+    				}//End of for loop
+    				
+    				//Residue
+    				
+    			}//End of def runParallelChunk
+    			
+    			/**Function that defines the series of instructions to be executed in one iteration of the resulting loop.
+    			 * Takes as input the iteration number.
+    			 * It handles mapping from iteration number to input & output arrays, 
+    			 * considering variants performed.*/
+    			def runInstructionOfIteration(it: Rep[Int])= comment("run instruction", verbose = true){
+    				var currInst:Int=0
+    				while (currInst<numInst){
+    					var itVal:Rep[Int]=((it*numInst)+currInst)+3+(2*numThreads)
+    					if (bfc){//Branch-free code
+    						input(varIntToRepInt(outputPos)+maxNumIt+(2*numThreads)+3)=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
+    						outputPos+=this.eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
+    					}
+    					else{//Branching code
+    						if (this.eval(input(itVal),value.asInstanceOf[Rep[Float]])){
+    							input(varIntToRepInt(outputPos)+maxNumIt+(2*numThreads)+3)=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
+    							outputPos+=1
+    						}
+    					}
+    				 	currInst+=1
+    				} //End of while loop
+    			}//End of def runInstructionOfIteration
+    			
+    			/**Function that defines the instructions to be executed for the residue left after applying unrolling, without
+    			 * uneven instructions per iteration. 
+    			 * Takes as input the absolute positions of tuples not visited.
+    			 * It handles mapping from iteration number to input & output arrays, 
+    			 * considering variants performed.*/
+    			def runInstructionUnrollResidue(itVal: Rep[Int])= comment("run residue instructions after unroll", verbose = true){
+    				if (bfc){ //Branch-free code
+    					input(varIntToRepInt(outputPos)+maxNumIt+(2*numThreads)+3)=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
+    					outputPos+=this.eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
+    				}
+    				else{//Branching code
+    					if (this.eval(input(itVal),value.asInstanceOf[Rep[Float]])){
+    						input(varIntToRepInt(outputPos)+maxNumIt+(2*numThreads)+3)=(itVal-3-(2*numThreads)).asInstanceOf[Rep[Float]]
+    						outputPos+=1
+    					}
+    				}
+    			}//End of def runInstructionUnrollResidue
+    		} //End of Abstract Loop Representation	
+    		
+    		/*Dummy class that enforces the use of parametric constuctor.*/
+    		class LoopRepresentation (maxNumIt: Rep[Int], valueForComparison: Rep[Float], predicate:String) extends AbstractLoopRepresentation(maxNumIt,valueForComparison,predicate){  
+    		}
+    		
+    		/*Initialization of the iteration space*/       
+    		val iterationSpace = new LoopRepresentation(maxNumIt, valueForComparison, predicate)
+    		
+    		/*Application of variants pased as an array of strings, and values of configuration variables*/
+    		for (instruction<-instructions){
+    		  /**If we want different configurations for succesive unrolling, vectorization or parallelization, 
+    		   * the local variables determining unroll depth, number of threads and size of vectorized instructions
+    		   * should be changed here.*/
+    		  iterationSpace.applyVariant(instruction)
+    		}
 
-		/*For ease of work, and after observing some unexpected typing issues (and forward references problems), we decided 			to place here the definition of the loop classes, in charge of handling the application of the variants.*/
-
-		/**Definition of the Abstract Loop Representation class, in charge of handling the application of the variants. */
-		abstract class AbstractLoopRepresentation {
-			/*Inner members*/
-			var numIterations: Exp[Any] =_; //Number of interations of original loop
-			var numIterationsUnrolled: Rep[Int] =_; //Number of Iterations of unrolled loop
-			var numThreads: Rep[Int] =_; //Number of threads
-			var value: Exp[Any] =_; //Value for comparison
-			var predicateType: String=_;//Predicate type
-			var numInst: Int =_; //Number of instructions per iteration. 1 by default.
-			var bfc: Boolean=_;//Flag to define if using branch-free-code. False by default.
-			var unrolled: Boolean=_;//Flag to define if loop has been unrolled. False by default.
-			var parallelized: Boolean=_;//Flag to define if loop has been parallelized. False by default.
-			var threadsDisplacement: Rep[Int] =_;
-
-			/*Parametric constructor. Takes as input the number of iterations, compare value and predictate.*/
-			def this (numIt: Rep[Int], compareValue: Rep[Float], pred:String){
-				this();
-				numIterations=numIt;
-				numIterationsUnrolled=numIt;
-				value=compareValue;
-				predicateType=pred;
-				numThreads=varIntToRepInt(zero);
-				threadsDisplacement=varIntToRepInt(zero);
-				numInst=1;
-				bfc=false;
-				unrolled=false;
-				parallelized=false;
-
-			}
-
-			/*Some getters...*/
-			def getPredicateType():String={
-				predicateType
-			}
-			def getNumIterations():Rep[Int]={
-				numIterationsUnrolled
-			}
-			def getNumThreads():Rep[Int]={
-				numThreads
-			}
-			def getThreadsDisplacement():Rep[Int]={
-				threadsDisplacement
-			}
-			def getNumInstructionsPerUnrolledIteration(): Int={
-				numInst
-			}
-			def isUnrolled():Boolean={
-				unrolled
-			}
-			def isParallelized():Boolean={
-				parallelized
-			}
-
-			/*Function in charge of applying variant changes to current loop configuration.*/
-			def applyVariant(instruction: String){
-				if (instruction=="Remove branching"){
-					bfc=true;
-				}
-				else if (instruction=="Unroll"){
-					unrolled=true;
-					numIterationsUnrolled=(numIterationsUnrolled/unrollDepth).asInstanceOf[Rep[Int]]
-					numInst=(numInst*(unrollDepth.asInstanceOf[Int])); 
-					/*TODO Check: The number of instructions only changes if there is more than one 		
-					iteration on the remaining loop.*/
-				}
-				else if (instruction=="Parallelize"){
-					parallelized=true;
-					numThreads=numThreadsSelected
-					threadsDisplacement=numThreadsSelected
-				}
-			}
-
-			/*runLoop: Function responsible for running the loop. 
-			Parallelization changes can be handled from here.*/
-			def runLoop(){
-
-				if (!parallelized){
-					/*Loop for code generation*/
-			        	for (i <- (0 until numIterationsUnrolled): Rep[Range]) {
-			        	  this.runInstructionOfIteration(i)
-			        	}
-				}
-				else{
-					//Parallel prefix sum...
-					for (j <- (0 until numThreads): Rep[Range]) {
-						this.runParallelPrefixSum(j)//Should be done in parallel
-					}
-
-					//Serial assignment of output positions...
-			
-					if (threadsDisplacement>0){
-						input(3+threadsDisplacement)=varIntToRepInt(zero).asInstanceOf[Rep[Float]];
-						for (k <- (1 until numThreads): Rep[Range]) {
-							input(3+k+threadsDisplacement)=input(3+k-1)+input(3+k-1+threadsDisplacement)
-						}
-						outputPos=input(3+numThreads-1)+input(3+numThreads-1+threadsDisplacement);
-					}
-
-					for (l <- (0 until numThreads): Rep[Range]) {
-						this.runParallelChunk(l)//Should be done in parallel
-					}
-					//Parallel writing...					
-
-				}
-
-				
-				if (this.unrolled && this.parallelized){
-				}
-				/*Code generation for a non-optimized loop with the residual iterations after incomplete parallelization*/
-		//		else if (this.parallelized){
-		//		        	if(((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*numInst*numThreads)<maxNumIt){
-		//					for (i <- ( (((numIterationsUnrolled/numThreads).asInstanceOf[Rep[Int]]*numInst*numThreads)+3+(2*threadsDisplacement)) until maxNumIt+3+(2*threadsDisplacement)): Rep[Range]) {
-		  //      			  		this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
-        		//			}
-			//		}		
-			//	}
-
-
-				/*Code generation for a non-optimized loop with the residual iterations after unrolling*/
-				else if (this.unrolled){
-				        	if((numIterationsUnrolled*numInst)<maxNumIt){
-							for (i <- ( ((numIterationsUnrolled*numInst)+3+(2*threadsDisplacement)) until maxNumIt+3+(2*threadsDisplacement)): Rep[Range]) {
-		        			  		this.runInstructionUnrollResidue(i)//Note the invocation to the residual instruction
-        					}
-					}		
-				}
-
-			}
-
-
-			/*Function that counts the outputs of a thread.
-			Takes as input the thread number.
-			It handles mapping from thread number to iteration number to input & output arrays, considering variants performed.*/
-			def runParallelPrefixSum(it: Rep[Int])= comment("parallel prefix sum", verbose = true){
-				var count: Variable[Int] = 0;
-				for (i <- (0 until (numIterationsUnrolled.asInstanceOf[Rep[Float]]/(numThreads).asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]): Rep[Range]) {
-					var currInst:Int=0;
-					while (currInst<numInst){
-						var itVal:Rep[Int]=3+(2*threadsDisplacement);
-						itVal+=currInst;
-						itVal+=((i+(it*numIterationsUnrolled/numThreads))*numInst)
-						if (bfc){
-							if (predicate=="equals"){
-									//println(input(itVal))
-									count+=(input(itVal)==value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
-							}
-   							else if (predicate=="greaterThan"){
-									count+=(input(itVal)>value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   							}	
-							else if (predicate=="greaterThanEquals"){
-									count+=(input(itVal)>=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   							}
-							else if (predicate=="lesserThan"){
-									count+=(input(itVal)<value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];  	   								}
-							else if (predicate=="lesserThanEquals"){
-									count+=(input(itVal)<=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];	
-		   					}
-							else if (predicate=="notEquals"){
-									count+=(input(itVal)!=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-		      					}
-			   				else {
-									count+=1;
-							}
-						}
-						else if (predicate=="equals"){
-							if (input(itVal)==value.asInstanceOf[Rep[Float]]){
-								count+=1;				
-							}
-						}
-   						else if (predicate=="greaterThan"){
-							if (input(itVal)>value.asInstanceOf[Rep[Float]]){
-								count+=1;				
-							}
-   						}	
-						else if (predicate=="greaterThanEquals"){
-							if (input(itVal)>=value.asInstanceOf[Rep[Float]]){
-								count+=1;				
-							}
-   						}
-						else if (predicate=="lesserThan"){
-							if (input(itVal)<value.asInstanceOf[Rep[Float]]){
-								count+=1;				
-							}
-   						}	
-						else if (predicate=="lesserThanEquals"){
-							if (input(itVal)<=value.asInstanceOf[Rep[Float]]){
-								count+=1;				
-							}
-   						}
-						else if (predicate=="notEquals"){
-							if (input(itVal)!=value.asInstanceOf[Rep[Float]]){
-								count+=1;				
-							}
-   						}
-   						else {
-								count+=1;				
-						}
-				
-						currInst=currInst+1;
-					} //End of while loop
-				}//End of for loop
-				input(3+it)=varIntToRepInt(count).asInstanceOf[Rep[Float]]; 		
-			}//End of def runParallelPrefixSum
-
-
-			/*Function that performs the parallel processing of a thread.
-			Takes as input the thread number.
-			It handles mapping from thread number to iteration number to input & output arrays, considering variants performed.*/
-			def runParallelChunk(it: Rep[Int])= comment("parallel chunk", verbose = true){
-				var count: Variable[Int] = 0;
-				for (i <- (0 until numIterationsUnrolled/numThreads): Rep[Range]) {
-					var currInst:Int=0;
-					while (currInst<numInst){
-						var itVal:Rep[Int]=3+(2*threadsDisplacement);
-						itVal+=currInst;
-						itVal+=((i+(it*numIterationsUnrolled/numThreads))*numInst)
-						if (bfc){
-							if (predicate=="equals"){
-									//println(input(itVal))
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-									count+=(input(itVal)==value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-							}
-   							else if (predicate=="greaterThan"){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=(input(itVal)>value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   							}	
-							else if (predicate=="greaterThanEquals"){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-	
-								count+=(input(itVal)>=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   							}
-							else if (predicate=="lesserThan"){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=(input(itVal)<value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];  	   								}
-							else if (predicate=="lesserThanEquals"){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=(input(itVal)<=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];	
-		   					}
-							else if (predicate=="notEquals"){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=(input(itVal)!=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-		      					}
-			   				else {
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;
-							}
-						}
-						else if (predicate=="equals"){
-							if (input(itVal)==value.asInstanceOf[Rep[Float]]){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;
-							}
-						}
-   						else if (predicate=="greaterThan"){
-							if (input(itVal)>value.asInstanceOf[Rep[Float]]){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;
-							}
-   						}	
-						else if (predicate=="greaterThanEquals"){
-							if (input(itVal)>=value.asInstanceOf[Rep[Float]]){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;
-							}
-   						}
-						else if (predicate=="lesserThan"){
-							if (input(itVal)<value.asInstanceOf[Rep[Float]]){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;
-							}
-   						}	
-						else if (predicate=="lesserThanEquals"){
-							if (input(itVal)<=value.asInstanceOf[Rep[Float]]){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;					
-							}
-   						}
-						else if (predicate=="notEquals"){
-							if (input(itVal)!=value.asInstanceOf[Rep[Float]]){
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;							
-							}
-   						}
-   						else {
-								input(input(3+it+threadsDisplacement).asInstanceOf[Rep[Int]]+3+(2*threadsDisplacement)+maxNumIt+varIntToRepInt(count))=input(itVal);
-								count+=1;						
-						}
-				
-						currInst=currInst+1;
-					} //End of while loop
-				}//End of for loop		
-			}//End of def runParallelChunk
-
-			/*Function that defines the series of instructions to be executed in one iteration of the resulting
-			loop.
-			Takes as input the iteration number.
-			It handles mapping from iteration number to input & output arrays, considering variants performed.*/
-			def runInstructionOfIteration(it: Rep[Int])= comment("run instruction", verbose = true){
-
-				var currInst:Int=0;
-				while (currInst<numInst){
-					var itVal:Rep[Int]=((it*numInst)+currInst)+3+(2*threadsDisplacement)
-					if (bfc){
-						if (predicate=="equals"){
-								//println(input(itVal))
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-								outputPos+=(input(itVal)==value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-						}
-   						else if (predicate=="greaterThan"){
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-				                		outputPos+=(input(itVal)>value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   						}	
-						else if (predicate=="greaterThanEquals"){
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-				                		outputPos+=(input(itVal)>=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   						}
-						else if (predicate=="lesserThan"){
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-				                		outputPos+=(input(itVal)<value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];   		   							}
-						else if (predicate=="lesserThanEquals"){
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-				                		outputPos+=(input(itVal)<=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];	
-	   					}
-						else if (predicate=="notEquals"){
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-				                		outputPos+=(input(itVal)!=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-	      					}
-		   				else {
-								input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-								outputPos+=1;
-						}
-					}
-					else if (predicate=="equals"){
-						if (input(itVal)==value.asInstanceOf[Rep[Float]]){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;
-						}
-					}
-   					else if (predicate=="greaterThan"){
-						if (input(itVal)>value.asInstanceOf[Rep[Float]]){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;
-						}
-   					}	
-					else if (predicate=="greaterThanEquals"){
-						if (input(itVal)>=value.asInstanceOf[Rep[Float]]){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;
-						}
-   					}
-					else if (predicate=="lesserThan"){
-						if (input(itVal)<value.asInstanceOf[Rep[Float]]){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;					
-						}
-   					}	
-					else if (predicate=="lesserThanEquals"){
-						if (input(itVal)<=value.asInstanceOf[Rep[Float]]){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;					
-						}
-   					}
-					else if (predicate=="notEquals"){
-						if (input(itVal)!=value.asInstanceOf[Rep[Float]]){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;
-						}
-   					}
-   					else {
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;
-					}
-				
-					currInst=currInst+1;
-				} //End of while loop		
-			}//End of def runInstructionOfIteration
-
-			/*Function that defines the instructions to be executed for the residue left after applying unrolling, without
-			uneven instructions per iteration. 
-			Takes as input the absolute positions of tuples not visited.
-			It handles mapping from iteration number to input & output arrays, considering variants performed.*/
-			def runInstructionUnrollResidue(itVal: Rep[Int])= comment("run residue instructions after unroll", verbose = true){
-				if (bfc){
-					if (predicate=="equals"){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=(input(itVal)==value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-					}
-   					else if (predicate=="greaterThan"){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-			                		outputPos+=(input(itVal)>value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-   					}	
-					else if (predicate=="greaterThanEquals"){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-			                		outputPos+=(input(itVal)>=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-  					}
-					else if (predicate=="lesserThan"){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-			                		outputPos+=(input(itVal)<value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];   		   						}
-					else if (predicate=="lesserThanEquals"){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-			                		outputPos+=(input(itVal)<=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];	
-   					}
-					else if (predicate=="notEquals"){
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-			                		outputPos+=(input(itVal)!=value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]];
-      					}
-	   				else {
-							input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-							outputPos+=1;
-					}
-				}
-				else if (predicate=="equals"){
-					if (input(itVal)==value.asInstanceOf[Rep[Float]]){
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;
-					}
-				}
-   				else if (predicate=="greaterThan"){
-					if (input(itVal)>value.asInstanceOf[Rep[Float]]){
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;
-					}
-   				}	
-				else if (predicate=="greaterThanEquals"){
-					if (input(itVal)>=value.asInstanceOf[Rep[Float]]){
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;
-					}
-   				}
-				else if (predicate=="lesserThan"){
-					if (input(itVal)<value.asInstanceOf[Rep[Float]]){
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;					
-					}
-   				}		
-				else if (predicate=="lesserThanEquals"){
-					if (input(itVal)<=value.asInstanceOf[Rep[Float]]){
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;					
-					}
-  				}
-				else if (predicate=="notEquals"){
-					if (input(itVal)!=value.asInstanceOf[Rep[Float]]){
-						input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-						outputPos+=1;
-					}
-				}
-   				else {
-					input(varIntToRepInt(outputPos)+maxNumIt+(2*threadsDisplacement)+3)=input(itVal)
-					outputPos+=1;
-				}
-			}//End of def runInstructionUnrollResidue
-
-		} //End of Abstract Loop Representation	
-
-		/*Dummy class that enforces the use of parametric constuctor.*/
-		class LoopRepresentation (maxNumIt: Rep[Int], valueForComparison: Rep[Float], predicate:String) extends AbstractLoopRepresentation(maxNumIt,valueForComparison,predicate){
-		}
-
-
- 		/*Initialization of the iteration space*/       
-		val iterationSpace = new LoopRepresentation(maxNumIt, valueForComparison, predicate)
-
-		/*Application of variants pased as an array of strings, and values of configuration variables*/
-		for (instruction<-instructions){
-			iterationSpace.applyVariant(instruction)
-
-			/*If we want different configurations for succesive unrolling, vectorization or parallelization, the 
-			local variables determining unroll depth, number of threads and size of vectorized instructions
-			should be changed here.*/
-		}
-
-		iterationSpace.runLoop();
+    		iterationSpace.runLoop() //Here we generate the code for the loop.
 		
-		/*Printing of the output array*/
-		println("Number of tuples: ");	
-		println(varIntToRepInt(outputPos));
-		println("Output array: ");
-		for (i <- (0 until varIntToRepInt(outputPos)): Rep[Range]) {
-        	  println(input(i+3+(2*iterationSpace.getThreadsDisplacement())+maxNumIt));
-        	}
-		if(varIntToRepInt(outputPos)==varIntToRepInt(zero)){
-		  println("No results found.")
-		}
-
-      	}//End of snippet function
-
+    		/*Printing of the output array*/
+    		println("Number of tuples: ")	
+    		println(varIntToRepInt(outputPos))
+    		println("Output array: ")
+    		var baseValue:Rep[Int]= 3+(2*iterationSpace.getNumThreads())+maxNumIt
+    		for (i <- (0 until varIntToRepInt(outputPos)): Rep[Range]) {
+    			println(input(i+baseValue))
+    		}
+    		if(varIntToRepInt(outputPos)==varIntToRepInt(zero)){
+    			println("No results found.")
+    		}
+    	}//End of snippet function
     /*End of area where context is shared between 2 stages*/
-
     }//End of use of DSL driver
 
     check("ScanVariants_"+predicate, snippet.code, "c")     /*The naming scheme can be modified in this line*/
-
-   /*Post-processing of the generated file so as to include Vectorization and Parallelization functions*/   
-   var fileLines = io.Source.fromFile("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c").getLines.toList
-   
-   /*We check if the code was parallelized, by seeing if it has as input the number of threads and if it has loops that
-   use this number as limit for the iteration space (this is a characteristic exclusive to code that uses parallelization)*/
-	if(fileLines.filter(x=>x.contains("x0[2]")).length>0){ 
-	   val numThreadsLine=fileLines.filter(x=>x.contains("x0[2]")).head;
-   	   var arrayOfSplitting: Array[java.lang.String] = numThreadsLine.split(" ")
-   	   val numThreadsIdentifier=arrayOfSplitting(3)
-   	   val loopHeaders= fileLines.filter(x=> x.contains("for(")).filter(x=> x.contains("< "+numThreadsIdentifier))
-   	   if (loopHeaders.length>0){
-   		val prefixSumHeader=loopHeaders(0);
-   		val parallelChunkHeader=loopHeaders(2);
-   		arrayOfSplitting= prefixSumHeader.split("=0")
-   		arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ");
-   		val integerRepresentation= arrayOfSplitting(0);
-   		val iteratorName_prefixSum=arrayOfSplitting(1);
-   		arrayOfSplitting = parallelChunkHeader.split("=0")
-   		arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ");
-   		val iteratorName_parallelChunk=arrayOfSplitting(1);
-   		def insert[A](xs: List[A], extra: List[A])(p: A => Boolean) = {
-  			xs.map(x => if (p(x)) extra ::: List(x) else List(x)).flatten
-   		}
+    
+    /***********************************************************************************************************
+    POST-PROCESSING SECTION 
+    Can be considered to be additional to the base program. 
+    In future versions, this section could be removed altogether.
+    ***********************************************************************************************************/
+    
+    /*Post-processing of the generated file so as to include the Parallelization*/
+    var fileLines = io.Source.fromFile("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c").getLines.toList
+    
+    /**We check if the code was parallelized, by seeing if it has as input the number of threads and if it has loops that
+     * use this number as limit for the iteration space (this is a characteristic exclusive to code that uses parallelization)*/
+    if(fileLines.filter(x=>x.contains("x0[2]")).length>0){ 
+    	val numThreadsLine=fileLines.filter(x=>x.contains("x0[2]")).head
+    	var arrayOfSplitting: Array[java.lang.String] = numThreadsLine.split(" ")
+   	   	val numThreadsIdentifier=arrayOfSplitting(3)
+   	   	val loopHeaders= fileLines.filter(x=> x.contains("for(")).filter(x=> x.contains("< "+numThreadsIdentifier))
+   	   	if (loopHeaders.length>0){
+   	   		val prefixSumHeader=loopHeaders(0)
+   	   		val parallelChunkHeader=loopHeaders(2)
+   	   		arrayOfSplitting= prefixSumHeader.split("=0")
+   	   		arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ")
+   	   		val integerRepresentation= arrayOfSplitting(0)
+   	   		val iteratorName_prefixSum=arrayOfSplitting(1)
+   	   		arrayOfSplitting = parallelChunkHeader.split("=0")
+   	   		arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ")
+   	   		val iteratorName_parallelChunk=arrayOfSplitting(1)
+   	   		
+   	   		def insert[A](xs: List[A], extra: List[A])(p: A => Boolean) = {
+   	   			xs.map(x => if (p(x)) extra ::: List(x) else List(x)).flatten
+   	   		}
 	
-		var auxList  = List[String]()
-		auxList= "  pthread_t threads[("+integerRepresentation+")"+numThreadsIdentifier+"];"::auxList
-		auxList=auxList:+("  "+integerRepresentation+" *inputArray;")
+   	   		var auxList  = List[String]()
+   	   		auxList= "  pthread_t threads[("+integerRepresentation+")"+numThreadsIdentifier+"];"::auxList
+   	   		auxList=auxList:+("  "+integerRepresentation+" *inputArray;")
 	        auxList=auxList:+("  inputArray=("+integerRepresentation+"*)malloc("+numThreadsIdentifier+"*sizeof("+integerRepresentation+"));")
-		fileLines=insert(fileLines,auxList) {_ == prefixSumHeader}
-		var str: String =" ";
-		var forHeaderDetected: Boolean = false;
-		var firstMessageSpotted: Boolean = false;
-		var doNothing: Boolean = false;
-		auxList  = List[String]()
-		var outputList  = List[String]()
-		for (str<- fileLines){
-			if (!forHeaderDetected){
-				if (str==prefixSumHeader){
-					forHeaderDetected=true;
-				}
-				else{
-					outputList=outputList:+(str)
-				}
-			}
-			else{
-			    if (!firstMessageSpotted){
-				auxList=auxList:+(str)
-				if(str.contains("//#parallel prefix sum")){
-					firstMessageSpotted=true;
-				}
-			    }
-			    else if (!doNothing){
-				auxList=auxList:+(str)
-				if(str.contains("//#parallel prefix sum")){
-					doNothing=true;
-				}
-			    }
-			}
-		}
-
-		outputList=outputList:+("  void* parallelPrefixSum(void* input){")
-		outputList=outputList:+("    "+integerRepresentation+" "+iteratorName_prefixSum+"=*("+integerRepresentation+"*)input;")
-		outputList=outputList++auxList
-		outputList=outputList:+("  }")
-		outputList=outputList:+(prefixSumHeader)
-		outputList=outputList:+("	inputArray["+iteratorName_prefixSum+"]="+iteratorName_prefixSum+";")
-		outputList=outputList:+("	pthread_create(&threads["+iteratorName_prefixSum+"], NULL, parallelPrefixSum, (void *)&inputArray["+iteratorName_prefixSum+"]);")
-		outputList=outputList:+("  }")
-		outputList=outputList:+(prefixSumHeader)
-		outputList=outputList:+("	pthread_join(threads["+iteratorName_prefixSum+"], NULL);")
-		outputList=outputList:+("  }")
+	        fileLines=insert(fileLines,auxList) {_ == prefixSumHeader}
+   	   		var str: String =" ";
+	        var forHeaderDetected: Boolean = false
+	        var firstMessageSpotted: Boolean = false
+	        var doNothing: Boolean = false
+	        var scanDetected: Boolean = false
+	        auxList  = List[String]()
+	        var outputList  = List[String]()
+	        for (str<- fileLines){
+	        	if (!scanDetected){
+	        		if (str.contains("*****************************************")){
+	        			outputList=outputList:+("#include <fcntl.h>")
+	        			outputList=outputList:+("#include <errno.h>")
+	        			outputList=outputList:+("#include <err.h>")
+	        			outputList=outputList:+("#include <sys/mman.h>")
+	        			outputList=outputList:+("#include <sys/stat.h>")
+	        			outputList=outputList:+("#include <stdio.h>")
+	        			outputList=outputList:+("#include <stdint.h>")
+	        			outputList=outputList:+("#include <unistd.h>")
+	        			outputList=outputList:+("#include <stdlib.h>")
+	        			outputList=outputList:+("#include <pthread.h>")
+	        			outputList=outputList:+("void Scan(float*);")
+	        			outputList=outputList:+("int main(int argc, char *argv[])")
+	        			outputList=outputList:+("{")
+	        			outputList=outputList:+("  if (argc < 5) {")
+	        			outputList=outputList:+("    printf(\"Missing arguments. Usage: filename numberOfTuples compareValue numThreads\\n\");")
+	        			outputList=outputList:+("    return 0;")
+	        			outputList=outputList:+("  }")
+	        			outputList=outputList:+("  printf(\"Usage: filename numberOfTuples compareValue numThreads\\n\");")
+	        			outputList=outputList:+("  FILE *ptr_file;")
+	        			outputList=outputList:+("  char buf[1000];")
+	        			outputList=outputList:+("  int numTuples=atoi(argv[2]);")
+	        			outputList=outputList:+("  float compareValue=atof(argv[3]);")
+	        			outputList=outputList:+("  int numThreads=atoi(argv[4]);")
+	        			outputList=outputList:+("  int numReadTuples=0;")
+	        			outputList=outputList:+("  ptr_file =fopen(argv[1],\"r\");")
+	        			outputList=outputList:+("  if (!ptr_file){")
+	        			outputList=outputList:+("    return 0;")
+	        			outputList=outputList:+("  }")    
+	        			outputList=outputList:+("  if (numTuples<=0){")
+	        			outputList=outputList:+("    printf(\"Error. Please pass a valid number of tuples.\\n\");")
+	        			outputList=outputList:+("    return 0;")
+	        			outputList=outputList:+("  }")
+	        			outputList=outputList:+("  if (numThreads<=0){")
+	        			outputList=outputList:+("    printf(\"Error. Please pass a valid number of threads.\\n\");")
+	        			outputList=outputList:+("    return 0;")
+	        			outputList=outputList:+("  }")
+	        			outputList=outputList:+("  float *array;")
+	        			outputList=outputList:+("  array=(float*)malloc(((2*numTuples)+3+(2*numThreads))*sizeof(float));")
+	        			outputList=outputList:+("  array[0]=compareValue;")
+	        			outputList=outputList:+("  array[1]=(float)numTuples;")
+	        			outputList=outputList:+("  array[2]=(float)numThreads;")
+	        			outputList=outputList:+("  for (int i=0; i<(2*numThreads); i++){")
+	        			outputList=outputList:+("    array[3+i]=(float)0;")
+	        			outputList=outputList:+("  }")
+	        			outputList=outputList:+("  while (fgets(buf,1000, ptr_file)!=NULL && numReadTuples<numTuples){")
+	        			outputList=outputList:+("    array[numReadTuples+3+(2*numThreads)]=atof(buf);")
+	        			outputList=outputList:+("    numReadTuples++;")
+	        			outputList=outputList:+("  }")
+	        			outputList=outputList:+("  fclose(ptr_file);")
+	        			outputList=outputList:+("  if (numReadTuples<numTuples){")
+	        			outputList=outputList:+("    printf(\"Error, file contains less tuples than specified.\\n\");");
+	        			outputList=outputList:+("    return 0;")
+	        			outputList=outputList:+("  }")
+	        			outputList=outputList:+("  Scan(array);")
+	        			outputList=outputList:+("  return 1;")
+	        			outputList=outputList:+("}")
+	        			outputList=outputList:+("/*****************************************")
+	        			scanDetected=true
+	        		}
+	        		else{
+	        			//Do nothing...
+	        		}
+	        	}
+	        	else if (!forHeaderDetected){
+	        		if (str==prefixSumHeader){
+	        			forHeaderDetected=true
+	        		}
+	        		else{
+	        			outputList=outputList:+(str)
+	        		}
+	        	}
+	        	else{
+	        		if (!firstMessageSpotted){
+	        			auxList=auxList:+(str)
+	        			if(str.contains("//#parallel prefix sum")){
+	        				firstMessageSpotted=true
+	        			}
+	        		}
+	        		else if (!doNothing){
+	        			auxList=auxList:+(str)
+	        			if(str.contains("//#parallel prefix sum")){
+	        				doNothing=true
+	        			}
+	        		}
+	        	}
+	        }
+	        outputList=outputList:+("  void* parallelPrefixSum(void* input){")
+	        outputList=outputList:+("    "+integerRepresentation+" "+iteratorName_prefixSum+"=*("+integerRepresentation+"*)input;")
+	        outputList=outputList++auxList
+	        outputList=outputList:+("  }")
+	        outputList=outputList:+(prefixSumHeader)
+	        outputList=outputList:+("	inputArray["+iteratorName_prefixSum+"]="+iteratorName_prefixSum+";")
+	        outputList=outputList:+("	pthread_create(&threads["+iteratorName_prefixSum+"], NULL, parallelPrefixSum, (void *)&inputArray["+iteratorName_prefixSum+"]);")
+	        outputList=outputList:+("  }")
+	        outputList=outputList:+(prefixSumHeader)
+	        outputList=outputList:+("	pthread_join(threads["+iteratorName_prefixSum+"], NULL);")
+	        outputList=outputList:+("  }")
 	
-		auxList  = List[String]()
-		forHeaderDetected= false;
-		firstMessageSpotted= false;
-		var secondMessageSpotted:Boolean= false;
-		var thirdMessageSpotted:Boolean= false;
-		var forthMessageSpotted:Boolean= false;
-		var trailingLineRemoved:Boolean= false;
-		doNothing= false;
+	        auxList  = List[String]()
+	        forHeaderDetected= false
+	        firstMessageSpotted= false
+	        var secondMessageSpotted:Boolean= false
+	        var thirdMessageSpotted:Boolean= false
+	        var forthMessageSpotted:Boolean= false
+	        var trailingLineRemoved:Boolean= false
+	        doNothing= false
 
-		for (str<- fileLines){
-			if (!firstMessageSpotted){
-				if(str.contains("//#parallel prefix sum")){
-					firstMessageSpotted=true;
-				}
-			}
-		else if (!secondMessageSpotted){
-			if(str.contains("//#parallel prefix sum")){
-				secondMessageSpotted=true;
-			}
-		}
-		else if(!trailingLineRemoved){
-			trailingLineRemoved=true;
-		}
-		else if (!forHeaderDetected){
-			if(str!=parallelChunkHeader){
-				outputList=outputList:+(str)
-			}
-			else{
-				forHeaderDetected=true;
-			}
-		}
-		else if (!thirdMessageSpotted){
-			auxList=auxList:+(str)
-			if(str.contains("//#parallel chunk")){
-				thirdMessageSpotted=true;
-			}			
-		}	
-		else if (!forthMessageSpotted){
-			auxList=auxList:+(str)
-			if(str.contains("//#parallel chunk")){
-				forthMessageSpotted=true;
-			}			
-		}			
-	   }
-	   outputList=outputList:+("  void* parallelChunk(void* input){");
-	   outputList=outputList:+("    "+integerRepresentation+" "+iteratorName_parallelChunk+"=*("+integerRepresentation+"*)input;")
-           outputList=outputList++auxList
-	   outputList=outputList:+("  }")
-	   outputList=outputList:+(parallelChunkHeader)
-	   outputList=outputList:+("  	pthread_create(&threads["+iteratorName_parallelChunk+"], NULL, parallelChunk, (void *)&inputArray["+iteratorName_parallelChunk+"]);") 
-	   outputList=outputList:+("  }")
-	   outputList=outputList:+(parallelChunkHeader)
-	   outputList=outputList:+("	pthread_join(threads["+iteratorName_parallelChunk+"], NULL);")
-	   outputList=outputList:+("  }")
-	   firstMessageSpotted=false;
-	secondMessageSpotted=false;
-	trailingLineRemoved= false;
-	for (str <-fileLines){
-		if(!firstMessageSpotted){
-			if(str.contains("//#parallel chunk")){
-				firstMessageSpotted=true;
-			}
-		}
-		else if (!secondMessageSpotted){
-			if(str.contains("//#parallel chunk")){
-				secondMessageSpotted=true;
-			}
-		}
-		else if (!trailingLineRemoved){
-				trailingLineRemoved=true;
-		}
-		else{
-			outputList=outputList:+(str)
-		}
-	}
-
-	/*We write back to the file*/	
-	val pw = new PrintWriter(new File("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c"))
-	for (str<- outputList){
-		pw.write(str+"\n");
-	}
-	pw.close();
-   }
-}
-
+	        for (str<- fileLines){
+	        	if (!firstMessageSpotted){
+	        		if(str.contains("//#parallel prefix sum")){
+	        			firstMessageSpotted=true
+	        		}
+	        	}
+	        	else if (!secondMessageSpotted){
+	        		if(str.contains("//#parallel prefix sum")){
+	        			secondMessageSpotted=true
+	        		}
+	        	}
+	        	else if(!trailingLineRemoved){
+	        		trailingLineRemoved=true
+	        	}
+	        	else if (!forHeaderDetected){
+	        		if(str!=parallelChunkHeader){
+	        			outputList=outputList:+(str)
+	        		}
+	        		else{
+	        			forHeaderDetected=true
+	        		}
+	        	}
+	        	else if (!thirdMessageSpotted){
+	        		auxList=auxList:+(str)
+	        		if(str.contains("//#parallel chunk")){
+	        			thirdMessageSpotted=true
+	        		}			
+	        	}	
+	        	else if (!forthMessageSpotted){
+	        		auxList=auxList:+(str)
+	        		if(str.contains("//#parallel chunk")){
+	        			forthMessageSpotted=true
+	        		}			
+	        	}			
+	        }
+	        outputList=outputList:+("  void* parallelChunk(void* input){")
+	        outputList=outputList:+("    "+integerRepresentation+" "+iteratorName_parallelChunk+"=*("+integerRepresentation+"*)input;")
+	        outputList=outputList++auxList
+	        outputList=outputList:+("  }")
+	        outputList=outputList:+(parallelChunkHeader)
+	        outputList=outputList:+("  	pthread_create(&threads["+iteratorName_parallelChunk+"], NULL, parallelChunk, (void *)&inputArray["+iteratorName_parallelChunk+"]);") 
+	        outputList=outputList:+("  }")
+	        outputList=outputList:+(parallelChunkHeader)
+	        outputList=outputList:+("	pthread_join(threads["+iteratorName_parallelChunk+"], NULL);")
+	        outputList=outputList:+("  }")
+	        firstMessageSpotted=false
+	        secondMessageSpotted=false
+	        trailingLineRemoved= false
+	        for (str <-fileLines){
+	        	if(!firstMessageSpotted){
+	        		if(str.contains("//#parallel chunk")){
+	        			firstMessageSpotted=true
+	        		}
+	        	}
+	        	else if (!secondMessageSpotted){
+	        		if(str.contains("//#parallel chunk")){
+	        			secondMessageSpotted=true
+	        		}
+	        	}
+	        	else if (!trailingLineRemoved){
+	        		trailingLineRemoved=true
+	        	}
+	        	else{
+	        		outputList=outputList:+(str)
+	        	}
+	        }
+	        
+	        /*We write back to the file*/	
+	        val pw = new PrintWriter(new File("src/out/c_code_generation_tests_ScanVariants_"+predicate+".check.c"))
+	        for (str<- outputList){
+	        	pw.write(str+"\n")
+	        }
+	        pw.close()
+   	   	}
+    }
   } //End of test "Scan Variants"
 } //End of class ScanVariantsTest
-
