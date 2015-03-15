@@ -16,7 +16,7 @@
 [0m[[0minfo[0m] [0mCompiling 1 Scala source to /home/gabriel/Desktop/lms/test_code/target/scala-2.10/test-classes...[0m
 [0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.10.2[0m
 [0m[[0mdebug[0m] [0mGetting compiler-interface from component compiler for Scala 2.10.2[0m
-[0m[[0mdebug[0m] [0mRunning cached compiler 3ee346ed, interfacing (CompilerInterface) with Scala compiler version 2.10.2-20140310-140650-2481f036a5[0m
+[0m[[0mdebug[0m] [0mRunning cached compiler 5b3cde1f, interfacing (CompilerInterface) with Scala compiler version 2.10.2-20140310-140650-2481f036a5[0m
 [0m[[0mdebug[0m] [0mCalling Scala compiler with arguments  (CompilerInterface):[0m
 [0m[[0mdebug[0m] [0m	-Yvirtualize[0m
 [0m[[0mdebug[0m] [0m	-deprecation[0m
@@ -24,7 +24,7 @@
 [0m[[0mdebug[0m] [0m	/usr/lib/jvm/java-8-oracle/jre/lib/resources.jar:/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar:/usr/lib/jvm/java-8-oracle/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jsse.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jce.jar:/usr/lib/jvm/java-8-oracle/jre/lib/charsets.jar:/usr/lib/jvm/java-8-oracle/jre/lib/jfr.jar:/usr/lib/jvm/java-8-oracle/jre/classes:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-library/jars/scala-library-2.10.2.jar[0m
 [0m[[0mdebug[0m] [0m	-classpath[0m
 [0m[[0mdebug[0m] [0m	/home/gabriel/Desktop/lms/test_code/target/scala-2.10/test-classes:/home/gabriel/Desktop/lms/test_code/target/scala-2.10/classes:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-compiler/jars/scala-compiler-2.10.2.jar:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-reflect/jars/scala-reflect-2.10.2.jar:/home/gabriel/.ivy2/local/EPFL/lms_2.10/0.3-SNAPSHOT/jars/lms_2.10.jar:/home/gabriel/.ivy2/cache/org.scalatest/scalatest_2.10/jars/scalatest_2.10-2.1.2.jar:/home/gabriel/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.10.3.jar:/home/gabriel/.ivy2/cache/org.scala-lang.virtualized/scala-actors/jars/scala-actors-2.10.2.jar[0m
-[0m[[0mdebug[0m] [0mScala compilation took 36.966677266 s[0m
+[0m[[0mdebug[0m] [0mScala compilation took 33.42560615 s[0m
 [0m[[0mdebug[0m] [0mNew invalidations:[0m
 [0m[[0mdebug[0m] [0m	Set()[0m
 [0m[[0mdebug[0m] [0mInitial set of included nodes: Set()[0m

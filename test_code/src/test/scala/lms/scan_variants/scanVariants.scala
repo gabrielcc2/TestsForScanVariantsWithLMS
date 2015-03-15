@@ -86,23 +86,20 @@ class ScanVariantsTests extends TutorialFunSuite {
      * taking input from console, so as to be usable by an existing system. **/
     
     /*Configuration for the variants to be applied*/
-    def numInstructionsForUnrolling: Int=4
+    def numVariantsToApply: Int=4
     
-    var instructions = new Array[String](numInstructionsForUnrolling) 
+    var instructions = new Array[String](numVariantsToApply) 
     instructions(0) = "Unroll"//"Unroll"//Remove branching"  
     instructions(1) = "Remove branching"//Parallelize" //"Unroll";
     instructions(2) = "Parallelize"//"Parallelize"//Parallelize";//"Parallelize";
     instructions(3) = "Unroll"//Unroll"//"_" or "Vectorize";
-    
-    def unrollDepth: Int=4
-    
-    def vectorSize: Int=4
-    
+        
+   
     /**Configuration for the predicate
-     * Could be equals, greaterThan, greaterThanEquals, lesserThan, lesserThanEquals, 
-     * notEquals. 
+     * Could be EQUAL, GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL, 
+     * NOT_EQUAL. 
      * Anything else would mean scan all.**/    
-    def predicateAssigned: String = "greaterThanEquals" 
+    def predicateAssigned: String = "GREATER" 
     
     						  
     /*Definition of the snippet for code-generation, using a slightly modified version of EPFL's LMS DSL api for C-code generation*/		
@@ -126,7 +123,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     		
     		def numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]]
 	  
-    		/*Local context variables*/
+    		/*Local context variables, used for initialization of variables*/
     		var initialOutputPos: this.Variable[Int]=0 //Definition of the initial output position, relative to number of hits.
 	  		
     		val zero: Rep[Int]=varIntToRepInt(initialOutputPos) //Definition of number 0, for typing purposes.
@@ -173,12 +170,12 @@ class ScanVariantsTests extends TutorialFunSuite {
     			/*Function for evaluating specific predicates*/
     			def eval (val1: Rep[Float], val2:Rep[Float]): Rep[Boolean] ={
     				predicate match {
-    					case "equals" => val1==val2 
-    					case "greaterThan" => val1>val2 
-    					case "greaterThanEquals" => val1>=val2 
-    					case "lesserThan" =>  val1<val2
-    					case "lesserThanEquals" => val1<=val2 
-    					case "notEquals" =>  val1!=val2 
+    					case "EQUAL" => val1==val2 
+    					case "GREATER" => val1>val2 
+    					case "GREATER_EQUAL" => val1>=val2 
+    					case "LESSER" =>  val1<val2
+    					case "LESSER_EQUAL" => val1<=val2 
+    					case "NOT_EQUAL" =>  val1!=val2 
     					case _ => true
     				}
     			}
@@ -292,7 +289,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     		}
     		
     		/*Class implementing loop unrolling*/
-    		class UnrolledLoop (decoratedLoop: SimpleLoop) extends LoopDecorator(decoratedLoop){
+    		class UnrolledLoop (decoratedLoop: SimpleLoop, unrollDepth:Int) extends LoopDecorator(decoratedLoop){
     		  
    			  override def numIterationsUnrolled=((decoratedLoop.numIterationsUnrolled).asInstanceOf[Rep[Float]]/unrollDepth).asInstanceOf[Rep[Int]]
    			  
@@ -452,30 +449,44 @@ class ScanVariantsTests extends TutorialFunSuite {
     			}
     			    			    			
     		}
+    		
+    		/*Class implementing vectorization*/
+    		class VectorizedLoop (decoratedLoop: SimpleLoop, vectorSize: Int) extends LoopDecorator (decoratedLoop) {
+    		  
+    		}
+    		
+       		/*Class implementing GPU parallelization*/
+    		class CudaLoop (decoratedLoop: SimpleLoop) extends LoopDecorator (decoratedLoop) {
+    		  
+    		}
 
     /***********************************************************************************************************
    	2. PROCESSING SECTION- Crucial area of the library, where the code is generated
     ***********************************************************************************************************/
     		
-    		/*Initialization of the loop*/       
+    		/*Creation of the generic loop*/       
     		var loop: SimpleLoop = new SimpleLoop(valueForComparison, maxNumIt, predicateAssigned)
     		
-    		/*Application of variants pased as an array of strings, and values of configuration variables*/
+    		val unrollDepthRequested:Int=4
+    		val vectorSizeRequested:Int=4
+
+    		/*Application of variants to the generic loop.*/
     		for (instruction<-instructions){
-    		  
-    		   /**If we want different configurations for succesive unrolling, vectorization or parallelization, 
-    		   * the local variables determining unroll depth, number of threads and size of vectorized instructions
-    		   * should be changed here.*/
     		  
     			instruction match {
     			   	case "Remove branching" => loop = new BranchFreeLoop(loop)
-    			   	case "Unroll" => loop = new UnrolledLoop(loop)
+    			   	case "Unroll" => loop = new UnrolledLoop(loop, unrollDepthRequested)
     			   	case "Parallelize" => loop = new ParallelLoop(loop)
+    			   	case "Vectorize" => loop = new VectorizedLoop(loop, vectorSizeRequested)
+    			   	case "GPU" => loop = new CudaLoop(loop)
     			   	case _ =>{} //Do nothing... Added to keep with format.
     			}
     		}
-
-    		var outputPos: Rep[Int]=varIntToRepInt(loop.runLoop()) //Here we generate the code for the loop.
+  		
+    		/*(Now that the variant loop has been configured we can generate it's code...)*/
+    		
+    		/*Code generation for the loop.*/
+    		var outputPos: Rep[Int]=varIntToRepInt(loop.runLoop()) 
 		    
     		/*Printing of the output array*/
     		println("Number of tuples found: ")	

@@ -1,8 +1,8 @@
 # TestsForScanVariantsWithLMS
 
-In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (https://github.com/scala-lms/tutorials/blob/master/src/test/scala/lms/tutorial/dslapi.scala, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. We are specifically studying how code generation could be carried out for loop unrolling, branch free code, vectorization (using the X86 instructions), parallelization (using phthreads) and their combinations.
+In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (https://github.com/scala-lms/tutorials/blob/master/src/test/scala/lms/tutorial/dslapi.scala, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. We are specifically studying how code generation could be carried out for loop unrolling, branch free code, vectorization (using the X86 instructions), parallelization (using phthreads) and their combinations. GPU parallelization has been added, but without support for combining it with other variants.
 
-Vectorization is still not included in this release.
+Vectorization and GPU parallelization are still not included in this release.
 
 Support for thread parallelism has worked so far by post-processing generated code, and not by defining new staged-operators in the LMS library.
 
@@ -33,9 +33,9 @@ If there is any problem installing sbt or configuring the code, please refer to:
 Upcoming work:
 - Complete remaining variants: Vectorization, by defining staged operators as seen in: https://github.com/TiarkRompf/virtualization-lms-core/blob/develop/src/common/BooleanOps.scala.
 
-- Test variant generation in combinations and with in different orders.
+- Test variant generation in combinations and in different orders.
 
-- Test for execution time for floats and ints (upload int version separately).
+- Test for execution time for floats and ints (upload int version of the library separately).
 
 Optional work for deployment:
 - Embed generator in cleaner function, taking input from console, so as to be usable by an existing system.
