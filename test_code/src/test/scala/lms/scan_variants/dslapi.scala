@@ -238,6 +238,7 @@ int main(int argc, char *argv[])
   int numReadTuples=0;
   ptr_file =fopen(argv[1],"r");
   if (!ptr_file){
+    printf("Error. Could not open the input file.\n");
     return 0;
   }
   if (numTuples<=0){
