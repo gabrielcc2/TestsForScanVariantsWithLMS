@@ -7,7 +7,6 @@ Author:
 Gabriel Campero
 gabrielcampero@acm.org
 
-
 Used library based on LMS source code by Tiark Rompf and others, retrieved on December, 2014, from: http://scala-lms.github.io/
 References used: 
 Klonatos, Yannis, et al. "Legobase: Building efficient query engines in a high-level language, 2014."
@@ -57,7 +56,12 @@ On casting VarIntToRepInt a new variable is created.
 Future work:
 - For clarity purposes, we decided implementing the loop optimizations using a decorator pattern. In every different loop optimization we
 decide which former functions to inherit or override. For robustness we might've introduced some redundancy, which can be checked.
+- Embed generator in cleaner function, taking input from console, so as to be usable by an existing system.
+- Design and apply a clear scheme for naming the generated codes according to variants used, or to other requirements from existing system.
 - A template type could also be used for the input variables.
+- Generate parallelism not through post-processing but through defining staged operators and emitting a function 
+(https://github.com/TiarkRompf/virtualization-lms-core/blob/develop/src/common/Functions.scala), albeit inlined at call site. 
+Perhaps a workaround for this inlining issue could be implemented, so as to make the generated accepted by more compilers.
 
 *********************************************************************************************************************************************
 */
@@ -68,8 +72,6 @@ import scala.virtualization.lms.common._
 import scala.io.Source
 import java.io.PrintWriter
 import java.io.File
-
-
 
 class ScanVariantsTests extends TutorialFunSuite {
   
@@ -92,18 +94,15 @@ class ScanVariantsTests extends TutorialFunSuite {
     instructions(1) = "Remove branching"//Parallelize" //"Unroll";
     instructions(2) = "Parallelize"//"Parallelize"//Parallelize";//"Parallelize";
     instructions(3) = "Unroll"//Unroll"//"_" or "Vectorize";
-        
    
     /**Configuration for the predicate
      * Could be EQUAL, GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL, 
      * NOT_EQUAL. 
      * Anything else would mean scan all.**/    
     def predicateAssigned: String = "GREATER_EQUAL" 
-    
     						  
     /*Definition of the snippet for code-generation, using a slightly modified version of EPFL's LMS DSL api for C-code generation*/		
     val snippet = new DslDriverC[Array[Float],Unit] {
-
           
     	/*Area where context is shared between 2 stages: the code-generation stage and the execution stage*/
     	
@@ -116,7 +115,6 @@ class ScanVariantsTests extends TutorialFunSuite {
 
       def snippet(input: Rep[Array[Float]]) = comment("Scan Variants", verbose = true) {
         
-        
     	/*Input values*/
     	def valueForComparison:Rep[Float]=input(0) 
 	    	
@@ -124,7 +122,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     		
     	def numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]]
 	  
-    		/*Local context variables, used for initialization of variables*/
+    	/*Local context variables, used for initialization of variables*/
     	var initialOutputPos: this.Variable[Int]=0 //Definition of the initial output position, relative to number of hits.
 	  		
     	val zero: Rep[Int]=varIntToRepInt(initialOutputPos) //Definition of number 0, for typing purposes.
@@ -179,8 +177,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     	      case "NOT_EQUAL" =>  val1!=val2 
     	      case _ => true
     		}
-    	  }
-    			
+    	  }		
     			    						
     	  /** runLoop: Outer function calling the execution of the loop (in this case, a simple loop)  
     	   *  Returns the number of hits found.*/
@@ -584,12 +581,10 @@ class ScanVariantsTests extends TutorialFunSuite {
    	   		val iteratorName_prefixSum=arrayOfSplitting(1)
    	   		arrayOfSplitting = parallelChunkHeader.split("=0")
    	   		arrayOfSplitting=arrayOfSplitting(0).replace("  for(","").split(" ")
-   	   		val iteratorName_parallelChunk=arrayOfSplitting(1)
-   	   		
+   	   		val iteratorName_parallelChunk=arrayOfSplitting(1)	
    	   		def insert[A](xs: List[A], extra: List[A])(p: A => Boolean) = {
    	   			xs.map(x => if (p(x)) extra ::: List(x) else List(x)).flatten
    	   		}
-	
    	   		var auxList  = List[String]()
    	   		auxList= "  pthread_t threads[("+integerRepresentation+")"+numThreadsIdentifier+"];"::auxList
    	   		auxList=auxList:+("  "+integerRepresentation+" *inputArray;")
@@ -705,7 +700,6 @@ class ScanVariantsTests extends TutorialFunSuite {
 	        outputList=outputList:+(prefixSumHeader)
 	        outputList=outputList:+("	pthread_join(threads["+iteratorName_prefixSum+"], NULL);")
 	        outputList=outputList:+("  }")
-	
 	        auxList  = List[String]()
 	        forHeaderDetected= false
 	        firstMessageSpotted= false
@@ -714,7 +708,6 @@ class ScanVariantsTests extends TutorialFunSuite {
 	        var forthMessageSpotted:Boolean= false
 	        var trailingLineRemoved:Boolean= false
 	        doNothing= false
-
 	        for (str<- fileLines){
 	        	if (!firstMessageSpotted){
 	        		if(str.contains("//#parallel prefix sum")){
