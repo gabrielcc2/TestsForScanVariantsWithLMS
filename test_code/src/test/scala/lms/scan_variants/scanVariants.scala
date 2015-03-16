@@ -90,9 +90,9 @@ class ScanVariantsTests extends TutorialFunSuite {
     def numVariantsToApply: Int=4
     
     var instructions = new Array[String](numVariantsToApply) 
-    instructions(0) = "_"//"Unroll"//Remove branching"  
+    instructions(0) = "Remove branching"//"Unroll"//Remove branching"  
     instructions(1) = "Unroll"//Parallelize" //"Unroll";
-    instructions(2) = "Unroll"//"Parallelize"//Parallelize";//"Parallelize";
+    instructions(2) = "Parallelize"//"Parallelize"//Parallelize";//"Parallelize";
     instructions(3) = "_"//Unroll"//"_" or "Vectorize";
    
     /**Configuration for the predicate
