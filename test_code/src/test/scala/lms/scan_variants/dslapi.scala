@@ -215,7 +215,7 @@ trait DslGenC extends CGenNumericOps
   override def emitSource[A:Manifest](args: List[Sym[_]], body: Block[A], functionName: String, out: java.io.PrintWriter) = {
     withStream(out) { //By default we will print the non-parallelized version
       stream.println("""
-	#include <fcntl.h>
+#include <fcntl.h>
 #include <errno.h>
 #include <err.h>
 #include <sys/mman.h>
@@ -224,6 +224,8 @@ trait DslGenC extends CGenNumericOps
 #include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <emmintrin.h>
+#include <mmintrin.h>
 void Scan(float*);
 int main(int argc, char *argv[])
 {

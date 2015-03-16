@@ -56,8 +56,7 @@ On casting VarIntToRepInt a new variable is created.
 ...
 Future work:
 - For clarity purposes, we decided implementing the loop optimizations using a decorator pattern. In every different loop optimization we
-decide which former functions to inherit or override. For robustness we introduced some redundant overriden functions.
-Perhaps in future versions of the library, these could be removed.
+decide which former functions to inherit or override. For robustness we might've introduced some redundancy, which can be checked.
 - A template type could also be used for the input variables.
 
 *********************************************************************************************************************************************
@@ -73,7 +72,7 @@ import java.io.File
 
 
 class ScanVariantsTests extends TutorialFunSuite {
-
+  
   /***********************************************************************************************************
    1. PRE-PROCESSING SECTION- DEFINITIONS
     ***********************************************************************************************************/
@@ -99,11 +98,12 @@ class ScanVariantsTests extends TutorialFunSuite {
      * Could be EQUAL, GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL, 
      * NOT_EQUAL. 
      * Anything else would mean scan all.**/    
-    def predicateAssigned: String = "GREATER" 
+    def predicateAssigned: String = "GREATER_EQUAL" 
     
     						  
     /*Definition of the snippet for code-generation, using a slightly modified version of EPFL's LMS DSL api for C-code generation*/		
     val snippet = new DslDriverC[Array[Float],Unit] {
+
           
     	/*Area where context is shared between 2 stages: the code-generation stage and the execution stage*/
     	
@@ -114,398 +114,450 @@ class ScanVariantsTests extends TutorialFunSuite {
     	 * In this way we pack both the input and the needed memory to be allocated. It is generated in the preceeding part of the code, 		
     	 * which is defined in the dsl api ...**/
 
-    	def snippet(input: Rep[Array[Float]]) = comment("Scan Variants", verbose = true) {
-	    
-    		/*Input values*/
-    		def valueForComparison:Rep[Float]=input(0) 
+      def snippet(input: Rep[Array[Float]]) = comment("Scan Variants", verbose = true) {
+        
+        
+    	/*Input values*/
+    	def valueForComparison:Rep[Float]=input(0) 
 	    	
-    		def maxNumIt:Rep[Int]=input(1).asInstanceOf[this.Rep[Int]]
+    	def maxNumIt:Rep[Int]=input(1).asInstanceOf[this.Rep[Int]]
     		
-    		def numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]]
+    	def numThreadsSelected:Rep[Int]=input(2).asInstanceOf[this.Rep[Int]]
 	  
     		/*Local context variables, used for initialization of variables*/
-    		var initialOutputPos: this.Variable[Int]=0 //Definition of the initial output position, relative to number of hits.
+    	var initialOutputPos: this.Variable[Int]=0 //Definition of the initial output position, relative to number of hits.
 	  		
-    		val zero: Rep[Int]=varIntToRepInt(initialOutputPos) //Definition of number 0, for typing purposes.
+    	val zero: Rep[Int]=varIntToRepInt(initialOutputPos) //Definition of number 0, for typing purposes.
     		
-    		var oneVar: this.Variable[Int]=1 //Definition of number 1, as variable, for typing purposes.
+    	var oneVar: this.Variable[Int]=1 //Definition of number 1, as variable, for typing purposes.
       	        		
-    		/*Definition of the AbstractLoop class, in charge of handling the application of the variants. */
-    		abstract class AbstractLoop {
-
-    			/*ATTRIBUTES*/
+    	/*Definition of the AbstractLoop class, in charge of handling the application of the variants. */
+    	abstract class AbstractLoop {
+    	  
+    	  /*ATTRIBUTES*/
+    	    
+    	  /*Main attributes (functions as values)*/
     			
-    			/*Main attributes (functions as values)*/
-    			
-    			def value: Rep[Float]//Value for comparison
+    	  def value: Rep[Float]//Value for comparison
     
-    			def numIterations: Rep[Int]//Number of interations of original loop
+    	  def numIterations: Rep[Int]//Number of interations of original loop
     			
-    			def predicate: String //Predicate
+    	  def predicate: String //Predicate
     			
-    			def outputPos: Var[Int] //Definition of the output position, relative to number of hits.
+    	  def outputPos: Var[Int] //Definition of the output position, relative to number of hits.
     			
-    			def numIterationsUnrolled: Rep[Int] //Number of Iterations of unrolled loop
+    	  def numIterationsUnrolled: Rep[Int] //Number of Iterations of unrolled loop
     			
-    			def numThreads: Rep[Int]  //Number of threads
+    	  def numThreads: Rep[Int]  //Number of threads
     			
-    			def numInst: Int  //Number of instructions per iteration. 1 by default.
+    	  def numInst: Int  //Number of instructions per iteration. 1 by default.
     			
-    			/*Secondary attributes*/
+    	  /*Secondary attributes*/
     			
-    			def displacementForIterationPos: Rep[Int] //Displacement for iteration position
+    	  def displacementForIterationPos: Rep[Int] //Displacement for iteration position
     			
-    			/*Flags*/
+    	  /*Flags*/
     			
-    			def bfc: Boolean //Flag indicating if branch free code was selected
+    	  def bfc: Boolean //Flag indicating if branch free code was selected
     			
-    			def parallel: Boolean //Flag indicating if parallelization has been selected
+    	  def parallel: Boolean //Flag indicating if parallelization has been selected
 
-    			/*FUNCTIONS*/
-    			/*Default constructor*/
-    			def this (valueForComparison: Rep[Float], maxNumIt: Rep[Int], pred:String){
-    			  this()//Nothing implemented, since its an abstract class
-    			}
+    	  /*FUNCTIONS*/
+    	  /*Default constructor*/
+    	  def this (valueForComparison: Rep[Float], maxNumIt: Rep[Int], pred:String){
+    	    this()//Nothing implemented, since its an abstract class
+    	  }
     			
-    			/*Function for evaluating specific predicates*/
-    			def eval (val1: Rep[Float], val2:Rep[Float]): Rep[Boolean] ={
-    				predicate match {
-    					case "EQUAL" => val1==val2 
-    					case "GREATER" => val1>val2 
-    					case "GREATER_EQUAL" => val1>=val2 
-    					case "LESSER" =>  val1<val2
-    					case "LESSER_EQUAL" => val1<=val2 
-    					case "NOT_EQUAL" =>  val1!=val2 
-    					case _ => true
-    				}
-    			}
+    	  /*Function for evaluating specific predicates*/
+    	  def eval (val1: Rep[Float], val2:Rep[Float]): Rep[Boolean] ={
+    	    predicate match {
+    	      case "EQUAL" => val1==val2 
+    	      case "GREATER" => val1>val2 
+    	      case "GREATER_EQUAL" => val1>=val2 
+    	      case "LESSER" =>  val1<val2
+    	      case "LESSER_EQUAL" => val1<=val2 
+    	      case "NOT_EQUAL" =>  val1!=val2 
+    	      case _ => true
+    		}
+    	  }
     			
     			    						
-    			/** runLoop: Outer function calling the execution of the loop (in this case, a simple loop)  
-    			 *  Returns the number of hits found.*/
-    			def runLoop(): Var[Int] = {
-    				innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration)
-    			}
+    	  /** runLoop: Outer function calling the execution of the loop (in this case, a simple loop)  
+    	   *  Returns the number of hits found.*/
+    	  def runLoop(): Var[Int] = {
+    	    innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration)
+    	  }
     			
-    			/** innerRunLoop: Inner function responsible for running the loop (in this case, a simple loop) 
-    			 *  Returns the number of hits found.
-    			 *  Takes as input the function in charge of the iteration, and the function in charge of the instruction per iteration*/
-    			def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int], Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
-    				/*Loop for code generation*/
-    				for (i <- (0 until numIterations): Rep[Range]) {
-    					iteration(i, instOfIt)
-    				}
-    				outputPos
-    			}
+    	  /** innerRunLoop: Inner function responsible for running the loop (in this case, a simple loop) 
+    	   *  Returns the number of hits found.
+    	   *  Takes as input the function in charge of the iteration, and the function in charge of the instruction per iteration*/
+    	  def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int], Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
+    	    /*Loop for code generation*/
+    		for (i <- (0 until numIterations): Rep[Range]) {
+    		  iteration(i, instOfIt)
+    		}
+    		outputPos
+    	  }
     			
-    			/**runIteration: All the steps to be performed during an interation*/
-    			def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("run iteration as in simple loop", verbose = true){
-    			  instOfIt(it, displacementForIterationPos)
-    			}
+    	  /**runIteration: All the steps to be performed during an interation*/
+    	  def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("run iteration as in simple loop", verbose = true){
+    	    instOfIt(it, displacementForIterationPos)
+    	  }
     			    			
-    			/**runInstructionOfIteration: Defines one single step of an iteration (w.r.t. the original iterations)*/
-    			def runInstructionOfIteration(it: Rep[Int], dispIt: Rep[Int])= comment("run instruction with branching", verbose = true){
-    				var itVal:Rep[Int]=it+dispIt
-    				if (eval(input(itVal),value.asInstanceOf[Rep[Float]])){ //Branching code
-    					input(varIntToRepInt(outputPos)+dispIt+numIterations)=(it).asInstanceOf[Rep[Float]]
-    					outputPos+=1
-    				}
-    			}
-
-       		}
-    		
-    		/*Simple loop class*/
-    		class SimpleLoop (valueForComparison: Rep[Float], maxNumIt: Rep[Int], pred:String) extends AbstractLoop (valueForComparison, maxNumIt, pred){
-    		  
-    		  /*Over-written functions, representing the initialization of the values*/
-    		  
-    		  override def value = valueForComparison
-    		  
-    		  override def numIterations = maxNumIt
-    		  
-    		  override def predicate = pred 
-    		  
-    		  override def outputPos =initialOutputPos
-    		  
-    		  override def displacementForIterationPos= 3
-    		  
-    		  override def numIterationsUnrolled=maxNumIt
-    		  
-    		  override def numInst=1
-    		  
-    		  override def numThreads=varIntToRepInt(oneVar)
-    		  
-    		  override def bfc=false
-    		  
-    		  override def parallel=false
-    			
+    	  /**runInstructionOfIteration: Defines one single step of an iteration (w.r.t. the original iterations)*/
+    	  def runInstructionOfIteration(it: Rep[Int], dispIt: Rep[Int])= comment("run instruction with branching", verbose = true){
+    	    var itVal:Rep[Int]=it+dispIt
+    	    if (eval(input(itVal),value.asInstanceOf[Rep[Float]])){ //Branching code
+    	      input(varIntToRepInt(outputPos)+dispIt+numIterations)=(it).asInstanceOf[Rep[Float]]
+    	      outputPos+=1
     		}
+    	  }
+    	  
+       	}
     		
-    		/**Class following the decorator pattern, allowing us to add up the different
-    		 * optimizations*/
-    		abstract class LoopDecorator (decoratedLoop: SimpleLoop)  extends SimpleLoop (decoratedLoop.value, decoratedLoop.numIterations, decoratedLoop.predicate) {
-    			
-    		  /*Over-written functions, representing inheritance of values*/
+    	/*Simple loop class*/
+    	class SimpleLoop (valueForComparison: Rep[Float], maxNumIt: Rep[Int], pred:String) extends AbstractLoop (valueForComparison, maxNumIt, pred){
+    	  
+    	  /*Over-written functions, representing the initialization of the values*/
+    	  
+    	  override def value = valueForComparison
     		  
-    			override def outputPos= decoratedLoop.outputPos
+    	  override def numIterations = maxNumIt
+    		  
+    	  override def predicate = pred 
+    		  
+    	  override def outputPos =initialOutputPos
+    		  
+    	  override def displacementForIterationPos= 3
+    		  
+    	  override def numIterationsUnrolled=maxNumIt
+    		  
+    	  override def numInst=1
+    		  
+    	  override def numThreads=varIntToRepInt(oneVar)
+    		  
+    	  override def bfc=false
+    		  
+    	  override def parallel=false
     			
-    			override def displacementForIterationPos= decoratedLoop.displacementForIterationPos 
-    			
-    			override def numIterationsUnrolled=decoratedLoop.numIterationsUnrolled
-    			
-    			override def numInst=decoratedLoop.numInst
-    			
-    			override def numThreads=decoratedLoop.numThreads
-    			
-    			override def bfc=decoratedLoop.bfc
-    			
-    			override def parallel=decoratedLoop.parallel
-    			
-    		}
+    	}
     		
-    		/*Class implementing branch removal*/
-    		class BranchFreeLoop (decoratedLoop: SimpleLoop) extends LoopDecorator (decoratedLoop) {
+    	/**Class following the decorator pattern, allowing us to add up the different
+    	* optimizations*/
+    	abstract class LoopDecorator (decoratedLoop: SimpleLoop)  extends SimpleLoop (decoratedLoop.value, decoratedLoop.numIterations, decoratedLoop.predicate) {
+    	  
+    	  /*Over-written functions, representing the use of existing decorations*/
     		  
-    		  override def bfc=true
-    		  
-    		  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("run instruction without branching", verbose = true){
-    		    val itVal:Rep[Int]=it+dispIt
-    			input(varIntToRepInt(outputPos)+dispIt+numIterations)=(it).asInstanceOf[Rep[Float]]
-    			outputPos+=eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]	
-    		  }
-    		  
-    		  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int],Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
-    			 decoratedLoop.innerRunLoop(numIn, numItU, runIteration, runInstructionOfIteration)
-    		  }
+    	  override def outputPos= decoratedLoop.outputPos
     			
-    		  override def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("decorated iteration", verbose = true){
-    			 decoratedLoop.runIteration(it, runInstructionOfIteration)
-    		  }
+    	  override def displacementForIterationPos= decoratedLoop.displacementForIterationPos 
     			
-    		  override def runLoop(): Var[Int]={
-    			innerRunLoop(decoratedLoop.numInst, decoratedLoop.numIterationsUnrolled, runIteration, runInstructionOfIteration)
-    		  }  	
-    		  
-    		}
+    	  override def numIterationsUnrolled=decoratedLoop.numIterationsUnrolled
+    			
+    	  override def numInst=decoratedLoop.numInst
+    			
+    	  override def numThreads=decoratedLoop.numThreads
+    			
+    	  override def bfc=decoratedLoop.bfc
+    			
+    	  override def parallel=decoratedLoop.parallel
+    	  
+    	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
+    	    decoratedLoop.runInstructionOfIteration(it, dispIt)
+    	  }
+    	  
+    	  override def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("decorated iteration", verbose = true){
+    		decoratedLoop.runIteration(it, runInstructionOfIteration)
+    	  }
+    	  
+    	  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int],Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
+    	    decoratedLoop.innerRunLoop(numIn, numItU, runIteration, runInstructionOfIteration)
+    	  }
+    			
+    	  override def runLoop(): Var[Int]={
+    	    innerRunLoop(decoratedLoop.numInst, decoratedLoop.numIterationsUnrolled, runIteration, runInstructionOfIteration)
+    	  }
+    			
+    	}
     		
-    		/*Class implementing loop unrolling*/
-    		class UnrolledLoop (decoratedLoop: SimpleLoop, unrollDepth:Int) extends LoopDecorator(decoratedLoop){
+    	/*Class implementing branch removal*/
+    	class BranchFreeLoop (decoratedLoop: SimpleLoop) extends LoopDecorator (decoratedLoop) {
     		  
-   			  override def numIterationsUnrolled=((decoratedLoop.numIterationsUnrolled).asInstanceOf[Rep[Float]]/unrollDepth).asInstanceOf[Rep[Int]]
+    	  override def bfc=true
+    		  
+    	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("run instruction without branching", verbose = true){
+    	    val itVal:Rep[Int]=it+dispIt
+    		input(varIntToRepInt(outputPos)+dispIt+numIterations)=(it).asInstanceOf[Rep[Float]]
+    		outputPos+=eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]	
+    	  }
+    		  
+    	}
+    		
+    	/*Class implementing loop unrolling*/
+    	class UnrolledLoop (decoratedLoop: SimpleLoop, unrollDepth:Int) extends LoopDecorator(decoratedLoop){
+    		  
+    	  override def numIterationsUnrolled=((decoratedLoop.numIterationsUnrolled).asInstanceOf[Rep[Float]]/unrollDepth).asInstanceOf[Rep[Int]]
    			  
-   			  override def numInst=(decoratedLoop.numInst*(unrollDepth.asInstanceOf[Int]))
-
-   			  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
-    			  decoratedLoop.runInstructionOfIteration(it, dispIt)
-    		  }
+    	  override def numInst=(decoratedLoop.numInst*(unrollDepth.asInstanceOf[Int]))
   
-    		  override def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("run iteration from unrolled loop", verbose = true){
-    		    var currInst:Int=0
-    		    val baseIt:Rep[Int]=(it*numInst)
-    			while (currInst<numInst){
-    			  var itVal:Rep[Int]=currInst+baseIt
-    			  runInstructionOfIteration(itVal, decoratedLoop.displacementForIterationPos)
-    			  currInst+=1
-    			} 
-    		  }
+    	  override def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("run iteration from unrolled loop", verbose = true){
+    		var currInst:Int=0
+    		val baseIt:Rep[Int]=(it*numInst)
+    		while (currInst<numInst){
+    		  var itVal:Rep[Int]=currInst+baseIt
+    		  runInstructionOfIteration(itVal, decoratedLoop.displacementForIterationPos)
+    		  currInst+=1
+    		} 
+    	  }
     		  
-    		  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int], Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int], Rep[Int])=>Unit): Var[Int] = {
-    		    if (decoratedLoop.parallel){
-    		        decoratedLoop.innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration)
-    			}
-    		    else{
-    		        /*Loop for code generation*/
-    		    	for (i <- (0 until numIterationsUnrolled): Rep[Range]) {
-    		    		runIteration(i, runInstructionOfIteration)
-    		    	}
-    		    	/*Residual iterations*/
-    		    	val maxIterationCovered:Rep[Int]=numIterationsUnrolled*numInst
-    		    	if(maxIterationCovered<numIterations){
-    		    		for (i <- (maxIterationCovered until numIterations): Rep[Range]) {
-    		    			runInstructionOfIteration(i, decoratedLoop.displacementForIterationPos)
-    		    		}
-    		    	}
-    		    	outputPos
+    	  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int], Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int], Rep[Int])=>Unit): Var[Int] = {
+    	    if (decoratedLoop.parallel){
+    	      decoratedLoop.innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration)
+    	    }
+    		else{
+    			/*Loop for code generation*/
+    			for (i <- (0 until numIterationsUnrolled): Rep[Range]) {
+    			  runIteration(i, runInstructionOfIteration)
     		    }
-    		  }
-
-    		  override def runLoop(): Var[Int] = {
-    		    innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration)
-    		  }
-    		  
+    			/*Residual iterations*/
+    			val maxIterationCovered:Rep[Int]=numIterationsUnrolled*numInst
+    			if(maxIterationCovered<numIterations){
+    			  for (i <- (maxIterationCovered until numIterations): Rep[Range]) {
+    			    runInstructionOfIteration(i, decoratedLoop.displacementForIterationPos)
+    			  }
+    			}
+    		    outputPos
     		}
+    	  }
+
+    	  override def runLoop(): Var[Int] = {
+    	    innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration)
+    	  }
+    		  
+    	}
     		
-    		/*Class implementing loop parallelization*/
-    		class ParallelLoop (decoratedLoop: SimpleLoop) extends LoopDecorator(decoratedLoop){
+    	/*Class implementing loop parallelization*/
+    	class ParallelLoop (decoratedLoop: SimpleLoop) extends LoopDecorator(decoratedLoop){
     			
-    			override def numThreads=numThreadsSelected
+    	  override def numThreads=numThreadsSelected
 
-    			override def parallel=true
+    	  override def parallel=true
     			
-    			override def displacementForIterationPos= {
-    			  if (!decoratedLoop.parallel){
-    			    decoratedLoop.displacementForIterationPos+(2*numThreads)
-    			  }
-    			  else{
-    			    decoratedLoop.displacementForIterationPos    			    
-    			  }
-    			}
+    	  override def displacementForIterationPos= {
+    	    if (!decoratedLoop.parallel){
+    	      decoratedLoop.displacementForIterationPos+(2*numThreads)
+    		}
+    		else{
+    		  decoratedLoop.displacementForIterationPos    			    
+    		}
+    	  }
 
-    			override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
-    			  decoratedLoop.runInstructionOfIteration(it, displacementForIterationPos)
+    	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
+    		  decoratedLoop.runInstructionOfIteration(it, displacementForIterationPos)
+    	  }
+    			  			    			
+    	  /**Function that counts the outputs of a thread.
+    	   * Takes as input the thread number.
+    	   * It handles mapping from thread number to iteration number to input & output arrays, 
+    	   * considering variants performed.**/
+    	  def runParallelPrefixSum(it:Rep[Int], numIn:Int, numItU:Rep[Int])= comment("parallel prefix sum", verbose = true){
+    	    var count: Variable[Int] = 0
+    	    var baseVal: Rep[Int]= (displacementForIterationPos)+numIn*((numItU/numThreads).asInstanceOf[Rep[Int]]*it)
+    	    for (i <- (0 until (numItU/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
+    	      var itVal:Rep[Int]=baseVal+(i*numIn)
+    	      var currInst:Int=0
+    	      while (currInst<numIn){
+    	        if (bfc){ //Branch-free code... To avoid using this flag we would have to create yet another function: count...
+    	          count+=eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
     			}
-    			  			
-    			override def runIteration(it: Rep[Int], instOfIt:(Rep[Int], Rep[Int])=>Unit)= comment("decorated iteration", verbose = true){
-    			  decoratedLoop.runIteration(it, runInstructionOfIteration)
-    			}
-    			
-    			/**Function that counts the outputs of a thread.
-    			 * Takes as input the thread number.
-    			 * It handles mapping from thread number to iteration number to input & output arrays, 
-    			 * considering variants performed.**/
-    			def runParallelPrefixSum(it:Rep[Int], numIn:Int, numItU:Rep[Int])= comment("parallel prefix sum", verbose = true){
-    				var count: Variable[Int] = 0
-    				var baseVal: Rep[Int]= (displacementForIterationPos)+numIn*((numItU/numThreads).asInstanceOf[Rep[Int]]*it)
-    				for (i <- (0 until (numItU/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
-    					var itVal:Rep[Int]=baseVal+(i*numIn)
-    					var currInst:Int=0
-    					while (currInst<numIn){
-    					  if (bfc){ //Branch-free code... To avoid using this flag we would have to create yet another function: count...
-    						count+=eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
-    					  }
-    					  else {//Branching code
-     						if (eval(input(itVal),value.asInstanceOf[Rep[Float]])){
-     							count+=1				
-    						}
-    					  }
-    					  currInst+=1
-    					  itVal+=1; 
-    					}
-    				}	    				
-    				input(3+it)=varIntToRepInt(count).asInstanceOf[Rep[Float]] //We store the size of output array before returning.		
-    			}
-    			
-    			
-    			/**Function that performs the parallel processing of a thread.
-    			 * Takes as input the thread number.
-    			 * It handles mapping from thread number to iteration number to input & output arrays, 
-    			 * considering variants performed.**/
-    			def runParallelChunk(it: Rep[Int], numIn:Int, numItU:Rep[Int])= comment("parallel chunk", verbose = true){
-    				var count: Variable[Int] = 0
-    				for (i <- (0 until (numItU/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
-    				    var currInst:Int=0
-    				    while (currInst<numIn){
-    						var itVal:Rep[Int]=displacementForIterationPos
-    						itVal+=currInst
-    						itVal+=((i+((numItU/numThreads).asInstanceOf[Rep[Int]]*it))*numInst)
-    						if (bfc){//Branch-free code... To avoid using this flag we would have to create yet another function...
-    							input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+displacementForIterationPos+numIterations+varIntToRepInt(count))=(itVal-displacementForIterationPos).asInstanceOf[Rep[Float]]
-    							count+=eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
-    						}
-    						else{//Branching code
-    						  if (eval(input(itVal),value.asInstanceOf[Rep[Float]])){
-    							  input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+displacementForIterationPos+numIterations+varIntToRepInt(count))=(itVal-displacementForIterationPos).asInstanceOf[Rep[Float]]
-    							  count+=1
-    						  }
-    						}
-    						currInst+=1
-    					} 
-    				}    				    				
-    			}    			
-    			
-    			override def innerRunLoop(numIn:Int, numItUn:Rep[Int], iteration:(Rep[Int],(Rep[Int], Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
-    			  //Parallel prefix sum...
-    			  for (j <- (0 until numThreads): Rep[Range]) {
-    			    runParallelPrefixSum(j, numIn, numItUn)
+    			else {//Branching code
+    			  if (eval(input(itVal),value.asInstanceOf[Rep[Float]])){
+    			    count+=1				
     			  }
+    			}
+    			currInst+=1
+    			itVal+=1; 
+    	      }
+    	    }	    				
+    		input(3+it)=varIntToRepInt(count).asInstanceOf[Rep[Float]] //We store the size of output array before returning.		
+    	  }
+    			
+    			
+    	  /**Function that performs the parallel processing of a thread.
+    	   * Takes as input the thread number.
+    	   * It handles mapping from thread number to iteration number to input & output arrays, 
+    	   * considering variants performed.**/
+    	  def runParallelChunk(it: Rep[Int], numIn:Int, numItU:Rep[Int])= comment("parallel chunk", verbose = true){
+    	    var count: Variable[Int] = 0
+    	    for (i <- (0 until (numItU/numThreads).asInstanceOf[Rep[Int]]): Rep[Range]) {
+    	      var currInst:Int=0
+    	      while (currInst<numIn){
+    	        var itVal:Rep[Int]=displacementForIterationPos
+    			itVal+=currInst
+    			itVal+=((i+((numItU/numThreads).asInstanceOf[Rep[Int]]*it))*numInst)
+    			if (bfc){//Branch-free code... To avoid using this flag we would have to create yet another function...
+    			  input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+displacementForIterationPos+numIterations+varIntToRepInt(count))=(itVal-displacementForIterationPos).asInstanceOf[Rep[Float]]
+    			  count+=eval(input(itVal),value.asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Int]]
+    			}
+    			else{//Branching code
+    			  if (eval(input(itVal),value.asInstanceOf[Rep[Float]])){
+    			    input(input(3+it+numThreads).asInstanceOf[Rep[Int]]+displacementForIterationPos+numIterations+varIntToRepInt(count))=(itVal-displacementForIterationPos).asInstanceOf[Rep[Float]]
+    				count+=1
+    			  }
+    			}
+    			currInst+=1
+    	      } 
+    		}    				    				
+    	  }    			
+    			
+    	  override def innerRunLoop(numIn:Int, numItUn:Rep[Int], iteration:(Rep[Int],(Rep[Int], Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
+    	    //Parallel prefix sum...
+    		for (j <- (0 until numThreads): Rep[Range]) {
+    		  runParallelPrefixSum(j, numIn, numItUn)
+    		}
 
-    			  //Serial assignment of output positions...
-    			  if (numThreads>0){
-    				 var tempVal:Rep[Int]=3+numThreads
-    				 input(tempVal)=zero.asInstanceOf[Rep[Float]]
-    				 for (k <- (1 until numThreads): Rep[Range]) {
-    					input(tempVal+k)=input(3+k-1)+input(tempVal+k-1)
-    				 }
-    				 outputPos=input(tempVal-1)+input(tempVal-1+numThreads)
-    			  }
+    		//Serial assignment of output positions...
+    		if (numThreads>0){
+    		  var tempVal:Rep[Int]=3+numThreads
+    		  input(tempVal)=zero.asInstanceOf[Rep[Float]]
+    		  for (k <- (1 until numThreads): Rep[Range]) {
+    		    input(tempVal+k)=input(3+k-1)+input(tempVal+k-1)
+    		  }
+    		  outputPos=input(tempVal-1)+input(tempVal-1+numThreads)
+    		}
     				  
-    			  //Parallel writing...					
-    			  for (l <- (0 until numThreads): Rep[Range]) {
-    				 this.runParallelChunk(l, numIn, numItUn)
-    			  }
+    		//Parallel writing...					
+    		for (l <- (0 until numThreads): Rep[Range]) {
+    		  this.runParallelChunk(l, numIn, numItUn)
+    		}
     
-    			  //Residual iterations
-    			  var maxIterationCovered:Rep[Int]= (numItUn/numThreads)*numIn*numThreads.asInstanceOf[Rep[Int]]
-    			  if(maxIterationCovered<numIterations){
-    			    for (i <- (maxIterationCovered until numIterations): Rep[Range]) {
-    			      runInstructionOfIteration(i, displacementForIterationPos)
-    			    }
-    			  }
-    			  outputPos
-    			}
+    		//Residual iterations
+    		var maxIterationCovered:Rep[Int]= (numItUn/numThreads)*numIn*numThreads.asInstanceOf[Rep[Int]]
+    		if(maxIterationCovered<numIterations){
+    		  for (i <- (maxIterationCovered until numIterations): Rep[Range]) {
+    		    runInstructionOfIteration(i, displacementForIterationPos)
+    		  }
+    		}
+    		outputPos
+    	  }
+    			    			    			    			    			
+    	}
+    		
+    	/*Class implementing vectorization*/
+    	class VectorizedLoop (decoratedLoop: SimpleLoop, vectorSize: Int) extends LoopDecorator (decoratedLoop) {
+    	  
+    	  /*Note: Overriden functions at this point are still empty, and are just included as a working template.
+    	   * Except for runLoop.*/
+    	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
+    	    decoratedLoop.runInstructionOfIteration(it, dispIt)
+    	  }
+    		  	
+    	  override def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("decorated iteration", verbose = true){
+    		decoratedLoop.runIteration(it, runInstructionOfIteration)
+    	  }
+    	  
+    	  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int],Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
+    	    decoratedLoop.innerRunLoop(numIn, numItU, runIteration, runInstructionOfIteration)
+    	  }
     			
-    			override def runLoop(): Var[Int] = {
-    				innerRunLoop(decoratedLoop.numInst, decoratedLoop.numIterationsUnrolled, runIteration, runInstructionOfIteration)
-    			}
-    			    			    			
-    		}
-    		
-    		/*Class implementing vectorization*/
-    		class VectorizedLoop (decoratedLoop: SimpleLoop, vectorSize: Int) extends LoopDecorator (decoratedLoop) {
+    	  override def runLoop(): Var[Int]={
+    	    
+    	    //ALIGNMENT
+    		/* My guess is that the alignment will be processed here, always. For this I can define a butFirst function, 
+    		 * which would take the first part of the iteration, if needed. Other loop will simply decorate this, except here.
+    		 * If done, start position must be checked for all the others...
+    		 * The comparison inside can be supported for both cases, with or without branches.*/
+    	    
+    	    //SIMD EXECUTION
+    	    /*The code for this generation is already in preparation.*/
+    		/*If there is previous or succesive unrolling, it will only concern this loop, and will be limited to 2 or 4 in our support.
+    		 * Most likely just 4 would be ok. No residues will have to be considered.
+    		 *This will be activated by flag.
+    	     * 
+    	     * Parallelization would only refer to this loop as well. Residuals could be an issue.
+    	     * 
+    	     * The comparison inside can be supported for both cases, with or without branches.*/
+    	    
+    	    //RESIDUAL ITERATIONS
+    	    /*Another function will have to be used for this, again this will be a function called atLast, handling only the residual
+    	     *iterations of this. This would require changing all other functions, to handle the new upper bound.
+    	     *The comparison inside can be supported for both cases, with or without branches.*/
+    		    
+    		 innerRunLoop(decoratedLoop.numInst, decoratedLoop.numIterationsUnrolled, runIteration, runInstructionOfIteration)
+    	  }  	
     		  
-    		}
+    	}
     		
-       		/*Class implementing GPU parallelization*/
-    		class CudaLoop (decoratedLoop: SimpleLoop) extends LoopDecorator (decoratedLoop) {
-    		  
-    		}
+       	/*Class implementing GPU parallelization*/
+    	class CudaLoop (decoratedLoop: SimpleLoop) extends LoopDecorator (decoratedLoop) {
+    	  
+    	  /*Note: Overriden functions at this point are still empty, and are just included as a working template*/
+    	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
+    	    decoratedLoop.runInstructionOfIteration(it, dispIt)
+    	  }
+    			
+    	  override def runIteration(it: Rep[Int], instOfIt:(Rep[Int],Rep[Int])=>Unit)= comment("decorated iteration", verbose = true){
+    		decoratedLoop.runIteration(it, runInstructionOfIteration)
+    	  }
+    	  
+    	  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int],Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit): Var[Int] = {
+    	    decoratedLoop.innerRunLoop(numIn, numItU, runIteration, runInstructionOfIteration)
+    	  }
+    			
+    	  override def runLoop(): Var[Int]={
+    	    innerRunLoop(decoratedLoop.numInst, decoratedLoop.numIterationsUnrolled, runIteration, runInstructionOfIteration)
+    	  }  	
+    		
+    	}
 
     /***********************************************************************************************************
    	2. PROCESSING SECTION- Crucial area of the library, where the code is generated
     ***********************************************************************************************************/
     		
-    		/*Creation of the generic loop*/       
-    		var loop: SimpleLoop = new SimpleLoop(valueForComparison, maxNumIt, predicateAssigned)
-    		
-    		val unrollDepthRequested:Int=4
-    		val vectorSizeRequested:Int=4
-
-    		/*Application of variants to the generic loop.*/
-    		for (instruction<-instructions){
-    		  
-    			instruction match {
-    			   	case "Remove branching" => loop = new BranchFreeLoop(loop)
-    			   	case "Unroll" => loop = new UnrolledLoop(loop, unrollDepthRequested)
-    			   	case "Parallelize" => loop = new ParallelLoop(loop)
-    			   	case "Vectorize" => loop = new VectorizedLoop(loop, vectorSizeRequested)
-    			   	case "GPU" => loop = new CudaLoop(loop)
-    			   	case _ =>{} //Do nothing... Added to keep with format.
-    			}
-    		}
-  		
-    		/*(Now that the variant loop has been configured we can generate it's code...)*/
-    		
-    		/*Code generation for the loop.*/
-    		var outputPos: Rep[Int]=varIntToRepInt(loop.runLoop()) 
-		    
-    		/*Printing of the output array*/
-    		println("Number of tuples found: ")	
-    		println(outputPos)
-    		
-    		if(outputPos!=zero){
-    			println("Output array: ")
-    			var baseValue:Rep[Int]= loop.displacementForIterationPos+loop.numIterations
-    			for (i <- (0 until outputPos): Rep[Range]) {
-    				println(input(i+baseValue))
-    			}
-    		}
-    		
-    	}//End of snippet function
+    	/*Creation of the generic loop*/       
+    	var loop: SimpleLoop = new SimpleLoop(valueForComparison, maxNumIt, predicateAssigned)
     	
-    /*End of area where context is shared between 2 stages*/
-    
-    }//End of use of DSL driver
+    	/*Variables for configuration (apart from instructions array)*/
+    	val unrollDepthRequested:Int=4
+    	val vectorSizeRequested:Int=4
 
+    	/*Application of variants to the generic loop.*/
+    	for (instruction<-instructions){	  
+    		instruction match {
+    		  case "Remove branching" => loop = new BranchFreeLoop(loop)
+    		  case "Unroll" => loop = new UnrolledLoop(loop, unrollDepthRequested)
+    		  case "Parallelize" => loop = new ParallelLoop(loop)
+    		  case "Vectorize" => loop = new VectorizedLoop(loop, vectorSizeRequested)
+    		  case "GPU" => loop = new CudaLoop(loop)
+    		  case _ =>{} //Do nothing... Added to keep with format.
+    		}
+    	}
+  		
+    	/*Now that the variant loop has been configured we can generate it's code...*/
+    		
+    	/*Code generation for the loop.*/
+    	var outputPos: Rep[Int]=varIntToRepInt(loop.runLoop()) 
+		    
+    	/*Printing of the output array*/
+    	println("Number of tuples found: ")	
+    	println(outputPos)
+    		
+    	if(outputPos!=zero){
+    		println("Output array: ")
+    		var baseValue:Rep[Int]= loop.displacementForIterationPos+loop.numIterations
+    		for (i <- (0 until outputPos): Rep[Range]) {
+    			println(input(i+baseValue))
+    		}
+    	}
+    		
+      }//End of snippet function
+      
+      /*End of area where context is shared between 2 stages*/
+   
+    }//End of use of DSL driver
+    
+    /*Only Scala code now...*/
+    
     check("ScanVariants_"+predicateAssigned, snippet.code, "c")     /*The naming scheme can be modified in this line*/
     
     /***********************************************************************************************************
@@ -563,6 +615,8 @@ class ScanVariantsTests extends TutorialFunSuite {
 	        			outputList=outputList:+("#include <unistd.h>")
 	        			outputList=outputList:+("#include <stdlib.h>")
 	        			outputList=outputList:+("#include <pthread.h>")
+	        			outputList=outputList:+("#include <emmintrin.h>")
+	        			outputList=outputList:+("#include <mmintrin.h>")
 	        			outputList=outputList:+("void Scan(float*);")
 	        			outputList=outputList:+("int main(int argc, char *argv[])")
 	        			outputList=outputList:+("{")
@@ -734,7 +788,8 @@ class ScanVariantsTests extends TutorialFunSuite {
 	        	pw.write(str+"\n")
 	        }
 	        pw.close()
-   	   	}
-    }
+   	   	}//End of if loopHeaders.length>0
+    }//End of if  fileLines.filter(x=>x.contains("x0[2]")).length>0 
+    
   } //End of test "Scan Variants"
 } //End of class ScanVariantsTest
