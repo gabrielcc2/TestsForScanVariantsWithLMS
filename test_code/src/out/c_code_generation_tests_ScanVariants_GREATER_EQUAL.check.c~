@@ -7,22 +7,19 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <emmintrin.h>
 #include <mmintrin.h>
 void Scan(float*);
 int main(int argc, char *argv[])
 {
-  if (argc < 5) {
-    printf("Missing arguments. Usage: filename numberOfTuples compareValue numThreads\n");
+  if (argc < 4) {
+    printf("Missing arguments. Usage: filename numberOfTuples compareValue\n");
     return 0;
   }
-  printf("Usage: filename numberOfTuples compareValue numThreads\n");
   FILE *ptr_file;
   char buf[1000];
   int numTuples=atoi(argv[2]);
   float compareValue=atof(argv[3]);
-  int numThreads=atoi(argv[4]);
   int numReadTuples=0;
   ptr_file =fopen(argv[1],"r");
   if (!ptr_file){
@@ -33,20 +30,13 @@ int main(int argc, char *argv[])
     printf("Error. Please pass a valid number of tuples.\n");
     return 0;
   }
-  if (numThreads<=0){
-    printf("Error. Please pass a valid number of threads.\n");
-    return 0;
-  }
   float *array;
-  array=(float*)malloc(((2*numTuples)+3+(2*numThreads))*sizeof(float));
+  array=(float*)malloc(((2*numTuples)+3)*sizeof(float));
   array[0]=compareValue;
   array[1]=(float)numTuples;
-  array[2]=(float)numThreads;
-  for (int i=0; i<(2*numThreads); i++){
-    array[3+i]=(float)0;
-  }
+  array[2]=(float)0; //Unused
   while (fgets(buf,1000, ptr_file)!=NULL && numReadTuples<numTuples){
-    array[numReadTuples+3+(2*numThreads)]=atof(buf);
+    array[numReadTuples+3]=atof(buf);
     numReadTuples++;
   }
   fclose(ptr_file);
@@ -65,432 +55,135 @@ Emitting C Generated Code
 #include <string.h>
 #include <stdbool.h>
 void Scan(float*  x0) {
-  float x7 = x0[2];
-  float x4 = x0[1];
-  float x5 = x4 / 4.0f;
-  float x6 = x5 / 4.0f;
-  int32_t x13 = x6 / x7;
   float x3 = x0[0];
-  int32_t x11 = 2 * x7;
-  int32_t x12 = 3 + x11;
-  bool x126 = x7 > 0;
-  int32_t x170 = x12 + 1;
-  int32_t x181 = x12 + 2;
-  int32_t x192 = x12 + 3;
-  int32_t x203 = x12 + 4;
-  int32_t x214 = x12 + 5;
-  int32_t x225 = x12 + 6;
-  int32_t x236 = x12 + 7;
-  int32_t x247 = x12 + 8;
-  int32_t x258 = x12 + 9;
-  int32_t x269 = x12 + 10;
-  int32_t x280 = x12 + 11;
-  int32_t x291 = x12 + 12;
-  int32_t x302 = x12 + 13;
-  int32_t x313 = x12 + 14;
-  int32_t x324 = x12 + 15;
-  int32_t x341 = x13 * 16;
-  int32_t x342 = x341 * x7;
-  bool x343 = x342 < x4;
+  float x4 = x0[1];
+  int32_t x42 = 3 + x4;
   //#Scan Variants
   // generated code for Scan Variants
   int32_t x1 = 0;
   int32_t x2 = 1;
-  pthread_t threads[(int)x7];
-  int *inputArray;
-  inputArray=(int*)malloc(x7*sizeof(int));
-  void* parallelPrefixSum(void* input){
-    int x9=*(int*)input;
-    int32_t x14 = x13 * x9;
-    int32_t x15 = 16 * x14;
-    int32_t x16 = x12 + x15;
-    int32_t x119 = 3 + x9;
-    //#parallel prefix sum
-    // generated code for parallel prefix sum
-    int32_t x10 = 0;
-    for(int x18=0; x18 < x13; x18++) {
-      int32_t x19 = x18 * 16;
-      int32_t x20 = x16 + x19;
+  int32_t x5 = sizeof(float);
+  int32_t x6 = sizeof(__m128);
+  __m128* x8 = (__m128*) &(x0[3]);
+  int32_t x9 = (intptr_t)(x8);
+  int32_t x10 = x9 % x6;
+  int32_t x11 = x6 - x10;
+  char* tmp_array= (char*) x8;
+  tmp_array+=x11;
+  x8=(__m128*)(tmp_array);
+  bool x17 = x11 == 0;
+  int32_t x12 = x11 / x5;
+  if (x17) {
+  } else {
+    for(int x19=0; x19 < x12; x19++) {
+      int32_t x20 = x19 + 3;
       float x21 = x0[x20];
       bool x22 = x21 >= x3;
-      if (x22) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x26 = x20 + 1;
-      float x27 = x0[x26];
-      bool x28 = x27 >= x3;
-      if (x28) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x32 = x26 + 1;
-      float x33 = x0[x32];
-      bool x34 = x33 >= x3;
-      if (x34) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x38 = x32 + 1;
-      float x39 = x0[x38];
-      bool x40 = x39 >= x3;
-      if (x40) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x44 = x38 + 1;
-      float x45 = x0[x44];
-      bool x46 = x45 >= x3;
-      if (x46) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x50 = x44 + 1;
-      float x51 = x0[x50];
-      bool x52 = x51 >= x3;
-      if (x52) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x56 = x50 + 1;
-      float x57 = x0[x56];
-      bool x58 = x57 >= x3;
-      if (x58) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x62 = x56 + 1;
-      float x63 = x0[x62];
-      bool x64 = x63 >= x3;
-      if (x64) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x68 = x62 + 1;
-      float x69 = x0[x68];
-      bool x70 = x69 >= x3;
-      if (x70) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x74 = x68 + 1;
-      float x75 = x0[x74];
-      bool x76 = x75 >= x3;
-      if (x76) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x80 = x74 + 1;
-      float x81 = x0[x80];
-      bool x82 = x81 >= x3;
-      if (x82) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x86 = x80 + 1;
-      float x87 = x0[x86];
-      bool x88 = x87 >= x3;
-      if (x88) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x92 = x86 + 1;
-      float x93 = x0[x92];
-      bool x94 = x93 >= x3;
-      if (x94) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x98 = x92 + 1;
-      float x99 = x0[x98];
-      bool x100 = x99 >= x3;
-      if (x100) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x104 = x98 + 1;
-      float x105 = x0[x104];
-      bool x106 = x105 >= x3;
-      if (x106) {
-        x10 += 1;
-      } else {
-      }
-      int32_t x110 = x104 + 1;
-      float x111 = x0[x110];
-      bool x112 = x111 >= x3;
-      if (x112) {
-        x10 += 1;
-      } else {
-      }
-    }
-    int32_t x120 = x10;
-    x0[x119] = x120;
-    //#parallel prefix sum
-  }
-  for(int x9=0; x9 < x7; x9++) {
-	inputArray[x9]=x9;
-	pthread_create(&threads[x9], NULL, parallelPrefixSum, (void *)&inputArray[x9]);
-  }
-  for(int x9=0; x9 < x7; x9++) {
-	pthread_join(threads[x9], NULL);
-  }
-  if (x126) {
-    int32_t x127 = 3 + x7;
-    x0[x127] = 0;
-    for(int x130=1; x130 < x7; x130++) {
-      int32_t x131 = x127 + x130;
-      int32_t x132 = 3 + x130;
-      int32_t x133 = x132 - 1;
-      float x134 = x0[x133];
-      int32_t x135 = x131 - 1;
-      float x136 = x0[x135];
-      float x137 = x134 + x136;
-      x0[x131] = x137;
-    }
-    int32_t x141 = x127 - 1;
-    float x142 = x0[x141];
-    int32_t x143 = x141 + x7;
-    float x144 = x0[x143];
-    float x145 = x142 + x144;
-    x1 = x145;
-  } else {
-  }
-  void* parallelChunk(void* input){
-    int x149=*(int*)input;
-    int32_t x152 = x13 * x149;
-    int32_t x158 = 3 + x149;
-    int32_t x159 = x158 + x7;
-    float x160 = x0[x159];
-    int32_t x161 = x160 + x12;
-    int32_t x162 = x161 + x4;
-    //#parallel chunk
-    // generated code for parallel chunk
-    int32_t x150 = 0;
-    for(int x151=0; x151 < x13; x151++) {
-      int32_t x153 = x151 + x152;
-      int32_t x154 = x153 * 4;
-      int32_t x155 = x12 + x154;
-      float x156 = x0[x155];
-      bool x157 = x156 >= x3;
-      if (x157) {
-        int32_t x163 = x150;
-        int32_t x164 = x162 + x163;
-        int32_t x165 = x155 - x12;
-        x0[x164] = x165;
-        x150 += 1;
-      } else {
-      }
-      int32_t x171 = x170 + x154;
-      float x172 = x0[x171];
-      bool x173 = x172 >= x3;
-      if (x173) {
-        int32_t x174 = x150;
-        int32_t x175 = x162 + x174;
-        int32_t x176 = x171 - x12;
-        x0[x175] = x176;
-        x150 += 1;
-      } else {
-      }
-      int32_t x182 = x181 + x154;
-      float x183 = x0[x182];
-      bool x184 = x183 >= x3;
-      if (x184) {
-        int32_t x185 = x150;
-        int32_t x186 = x162 + x185;
-        int32_t x187 = x182 - x12;
-        x0[x186] = x187;
-        x150 += 1;
-      } else {
-      }
-      int32_t x193 = x192 + x154;
-      float x194 = x0[x193];
-      bool x195 = x194 >= x3;
-      if (x195) {
-        int32_t x196 = x150;
-        int32_t x197 = x162 + x196;
-        int32_t x198 = x193 - x12;
-        x0[x197] = x198;
-        x150 += 1;
-      } else {
-      }
-      int32_t x204 = x203 + x154;
-      float x205 = x0[x204];
-      bool x206 = x205 >= x3;
-      if (x206) {
-        int32_t x207 = x150;
-        int32_t x208 = x162 + x207;
-        int32_t x209 = x204 - x12;
-        x0[x208] = x209;
-        x150 += 1;
-      } else {
-      }
-      int32_t x215 = x214 + x154;
-      float x216 = x0[x215];
-      bool x217 = x216 >= x3;
-      if (x217) {
-        int32_t x218 = x150;
-        int32_t x219 = x162 + x218;
-        int32_t x220 = x215 - x12;
-        x0[x219] = x220;
-        x150 += 1;
-      } else {
-      }
-      int32_t x226 = x225 + x154;
-      float x227 = x0[x226];
-      bool x228 = x227 >= x3;
-      if (x228) {
-        int32_t x229 = x150;
-        int32_t x230 = x162 + x229;
-        int32_t x231 = x226 - x12;
-        x0[x230] = x231;
-        x150 += 1;
-      } else {
-      }
-      int32_t x237 = x236 + x154;
-      float x238 = x0[x237];
-      bool x239 = x238 >= x3;
-      if (x239) {
-        int32_t x240 = x150;
-        int32_t x241 = x162 + x240;
-        int32_t x242 = x237 - x12;
-        x0[x241] = x242;
-        x150 += 1;
-      } else {
-      }
-      int32_t x248 = x247 + x154;
-      float x249 = x0[x248];
-      bool x250 = x249 >= x3;
-      if (x250) {
-        int32_t x251 = x150;
-        int32_t x252 = x162 + x251;
-        int32_t x253 = x248 - x12;
-        x0[x252] = x253;
-        x150 += 1;
-      } else {
-      }
-      int32_t x259 = x258 + x154;
-      float x260 = x0[x259];
-      bool x261 = x260 >= x3;
-      if (x261) {
-        int32_t x262 = x150;
-        int32_t x263 = x162 + x262;
-        int32_t x264 = x259 - x12;
-        x0[x263] = x264;
-        x150 += 1;
-      } else {
-      }
-      int32_t x270 = x269 + x154;
-      float x271 = x0[x270];
-      bool x272 = x271 >= x3;
-      if (x272) {
-        int32_t x273 = x150;
-        int32_t x274 = x162 + x273;
-        int32_t x275 = x270 - x12;
-        x0[x274] = x275;
-        x150 += 1;
-      } else {
-      }
-      int32_t x281 = x280 + x154;
-      float x282 = x0[x281];
-      bool x283 = x282 >= x3;
-      if (x283) {
-        int32_t x284 = x150;
-        int32_t x285 = x162 + x284;
-        int32_t x286 = x281 - x12;
-        x0[x285] = x286;
-        x150 += 1;
-      } else {
-      }
-      int32_t x292 = x291 + x154;
-      float x293 = x0[x292];
-      bool x294 = x293 >= x3;
-      if (x294) {
-        int32_t x295 = x150;
-        int32_t x296 = x162 + x295;
-        int32_t x297 = x292 - x12;
-        x0[x296] = x297;
-        x150 += 1;
-      } else {
-      }
-      int32_t x303 = x302 + x154;
-      float x304 = x0[x303];
-      bool x305 = x304 >= x3;
-      if (x305) {
-        int32_t x306 = x150;
-        int32_t x307 = x162 + x306;
-        int32_t x308 = x303 - x12;
-        x0[x307] = x308;
-        x150 += 1;
-      } else {
-      }
-      int32_t x314 = x313 + x154;
-      float x315 = x0[x314];
-      bool x316 = x315 >= x3;
-      if (x316) {
-        int32_t x317 = x150;
-        int32_t x318 = x162 + x317;
-        int32_t x319 = x314 - x12;
-        x0[x318] = x319;
-        x150 += 1;
-      } else {
-      }
-      int32_t x325 = x324 + x154;
-      float x326 = x0[x325];
-      bool x327 = x326 >= x3;
-      if (x327) {
-        int32_t x328 = x150;
-        int32_t x329 = x162 + x328;
-        int32_t x330 = x325 - x12;
-        x0[x329] = x330;
-        x150 += 1;
-      } else {
-      }
-    }
-    //#parallel chunk
-  }
-  for(int x149=0; x149 < x7; x149++) {
-  	pthread_create(&threads[x149], NULL, parallelChunk, (void *)&inputArray[x149]);
-  }
-  for(int x149=0; x149 < x7; x149++) {
-	pthread_join(threads[x149], NULL);
-  }
-  if (x343) {
-    for(int x345=x342; x345 < x4; x345++) {
-      int32_t x346 = x345 + x12;
-      float x347 = x0[x346];
-      bool x348 = x347 >= x3;
-      //#decorated instruction
-      // generated code for decorated instruction
       //#decorated instruction
       // generated code for decorated instruction
       //#run instruction with branching
       // generated code for run instruction with branching
-      if (x348) {
-        int32_t x349 = x1;
-        int32_t x350 = x349 + x12;
-        int32_t x351 = x350 + x4;
-        x0[x351] = x345;
+      if (x22) {
+        int32_t x23 = x1;
+        int32_t x24 = x23 + 3;
+        int32_t x25 = x24 + x4;
+        x0[x25] = x19;
         x1 += 1;
       } else {
       }
       //#run instruction with branching
       //#decorated instruction
-      //#decorated instruction
     }
-  } else {
   }
-  int32_t x366 = x1;
+  int32_t x38 = x12;
+  __m128 x39 = _mm_set1_ps(x3);
+  __m128 x40 = _mm_set1_ps(0);
+  __m128 x41 = _mm_set1_ps(0);
+  int32_t x13 = x4 - x12;
+  int32_t x14 = x13 * x5;
+  int32_t x15 = x14 / x6;
+  for(int x44=0; x44 < x15; x44++) {
+    float* x46 = (float*) &(x8[x44]);
+    __m128 x47 = _mm_load_ps(x46);
+    __m128 x48 = _mm_cmpge_ps(x47,x39);
+    int32_t x49 = _mm_movemask_ps((__m128)x48);
+    int32_t x50 = (x49 & 1);
+    if (x50) {
+      int32_t x51 = x1;
+      int32_t x53 = x38;
+      int32_t x52 = x51 + x42;
+      x0[x52] = x53;
+      x1 += 1;
+    } else {
+    }
+    x38 += 1;
+    int32_t x59 = (x49 >> 1);
+    int32_t x60 = (x59 & 1);
+    if (x60) {
+      int32_t x61 = x1;
+      int32_t x63 = x38;
+      int32_t x62 = x61 + x42;
+      x0[x62] = x63;
+      x1 += 1;
+    } else {
+    }
+    x38 += 1;
+    int32_t x69 = (x49 >> 2);
+    int32_t x70 = (x69 & 1);
+    if (x70) {
+      int32_t x71 = x1;
+      int32_t x73 = x38;
+      int32_t x72 = x71 + x42;
+      x0[x72] = x73;
+      x1 += 1;
+    } else {
+    }
+    x38 += 1;
+    int32_t x79 = (x49 >> 3);
+    int32_t x80 = (x79 & 1);
+    if (x80) {
+      int32_t x81 = x1;
+      int32_t x83 = x38;
+      int32_t x82 = x81 + x42;
+      x0[x82] = x83;
+      x1 += 1;
+    } else {
+    }
+    x38 += 1;
+  }
+  int32_t x91 = x15 * x6;
+  int32_t x92 = x91 / x5;
+  int32_t x93 = x92 + x12;
+  for(int x95=x93; x95 < x4; x95++) {
+    int32_t x96 = x95 + 3;
+    float x97 = x0[x96];
+    bool x98 = x97 >= x3;
+    //#decorated instruction
+    // generated code for decorated instruction
+    //#run instruction with branching
+    // generated code for run instruction with branching
+    if (x98) {
+      int32_t x99 = x1;
+      int32_t x100 = x99 + 3;
+      int32_t x101 = x100 + x4;
+      x0[x101] = x95;
+      x1 += 1;
+    } else {
+    }
+    //#run instruction with branching
+    //#decorated instruction
+  }
+  int32_t x112 = x1;
   printf("%s\n","Number of tuples found: ");
-  printf("%d\n",x366);
-  bool x370 = x366 == 0;
-  if (x370) {
+  printf("%d\n",x112);
+  bool x116 = x112 == 0;
+  if (x116) {
   } else {
     printf("%s\n","Output array: ");
-    int32_t x372 = x12 + x4;
-    for(int x374=0; x374 < x366; x374++) {
-      int32_t x375 = x374 + x372;
-      float x376 = x0[x375];
-      printf("%f\n",x376);
+    for(int x119=0; x119 < x112; x119++) {
+      int32_t x120 = x119 + x42;
+      float x121 = x0[x120];
+      printf("%f\n",x121);
     }
   }
   //#Scan Variants

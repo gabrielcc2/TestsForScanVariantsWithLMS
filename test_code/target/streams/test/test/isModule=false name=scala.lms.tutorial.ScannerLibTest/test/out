@@ -1,6 +1,0 @@
-[0m[[0minfo[0m] [0m[32mScannerLibTest:[0m[0m
-[0m[[0minfo[0m] [0m[32m- low-level first field scanning[0m[0m
-[0m[[0minfo[0m] [0m[32m- low-level first 2 fields scanning[0m[0m
-[0m[[0minfo[0m] [0m[32m- low-level first line scanning[0m[0m
-[0m[[0minfo[0m] [0m[32m- low-level schema scanning[0m[0m
-[0m[[0minfo[0m] [0m[32m- low-level record scanning knowing schema[0m[0m

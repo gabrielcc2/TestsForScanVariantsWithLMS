@@ -1,7 +1,4 @@
 /*******************************************************************************************************************************************
-Current issue:
-Check order when generating code for BF and parallel, theres something not going right. Correct and add to all.
-
 ScalaVariantTests class, defining some initial tests for developing a code-generating scheme for scan variants,
 based on EPFL's Light-weight modular staging library and a slightly modified version of their DSL api for 
 C-code generation.
@@ -31,6 +28,8 @@ and other institutions.
 
 *********************************************************************************************************************************************
 Notes on variants applied:
+For clarity purposes, we decided implementing the loop optimizations using a decorator pattern. In every different loop optimization we
+decide which former functions to inherit or override. 
 
 	BRANCH REMOVAL: Only one call of remove branching is effectful. More calls dont add anything new to the execution.
 
@@ -43,29 +42,29 @@ Notes on variants applied:
 	Adding more threads than there are iterations will have no effect, and the loop will run unparallelized in the section defined as the residue
     of the unrolling.
 	
-	VECTORIZATION:?
+	VECTORIZATION: Only a vector of size 4 is supported in this version.
 	
 	GPU PARALLELIZATION:
 
 *********************************************************************************************************************************************
-Working Notes:
-...
-List of some limitations observed from the DSL api:
-Its not possible to do multiple assignments to a position in an Array of Rep: only the first is performed.
-We cannot use a Rep as a counter either. The attempt of changing the value multiple times gets it to not show.
-We cannot cast a RepInt to a VarInt, but the other way around is Ok.
-On casting VarIntToRepInt a new variable is created. 
-...
 Future work:
-- For clarity purposes, we decided implementing the loop optimizations using a decorator pattern. In every different loop optimization we
-decide which former functions to inherit or override. For robustness we might've introduced some redundancy, which can be checked.
 - Embed generator in cleaner function, taking input from console, so as to be usable by an existing system.
 - Design and apply a clear scheme for naming the generated codes according to variants used, or to other requirements from existing system.
 - A template type could also be used for the input variables.
+- In order to support vectorization, some functions for mapping were implemented in the scala.virtualization.lms.common.MiscOps file.
+  However they were implemented without reflection (since using that would imply using Rep[] as input, which then would be mapped to
+  C with quotation marks or with the Const() transformator). It would be of interest to evaluate if the reflective effects would be needed, if so,
+  the Rep[] input should be used, and the small errors of using quotation marks of the Const() transformator have to be addressed by post-processing 
+  the generated code, or another method.
 - Generate parallelism not through post-processing but through defining staged operators and emitting a function 
 (https://github.com/TiarkRompf/virtualization-lms-core/blob/develop/src/common/Functions.scala), albeit inlined at call site. 
 Perhaps a workaround for this inlining issue could be implemented, so as to make the generated accepted by more compilers.
 
+Upcoming work:
+    	     * Check extensions to branch vs. non-branch, in different orders
+    	     * Deal with unrolling
+    	     * Deal with parallelization
+    	     * Combinatory testing with input + Generate Code Examples    	
 *********************************************************************************************************************************************
 */
 
@@ -93,10 +92,10 @@ class ScanVariantsTests extends TutorialFunSuite {
     def numVariantsToApply: Int=4
     
     var instructions = new Array[String](numVariantsToApply) 
-    instructions(0) = "Unroll"//"Unroll"//Remove branching"  
-    instructions(1) = "Remove branching"//Remove branching"//Parallelize" //"Unroll";
-    instructions(2) = "Parallelize"//Unroll"//"Parallelize"//Parallelize";//"Parallelize";
-    instructions(3) = "Unroll"//Parallelize"//Unroll"//"_" or "Vectorize";
+    instructions(0) = "_"//"Unroll"
+    instructions(1) = "_"//"Remove branching"
+    instructions(2) = "Parallelize"//"Parallelize"
+    instructions(3) = "_"//"Vectorize"//"Vectorize"
    
     /**Configuration for the predicate
      * Could be EQUAL, GREATER, GREATER_EQUAL, LESSER, LESSER_EQUAL, 
@@ -110,11 +109,15 @@ class ScanVariantsTests extends TutorialFunSuite {
     	/*Area where context is shared between 2 stages: the code-generation stage and the execution stage*/
     	
     	/**Snippet function defining the function whose code is to be generated
-    	 * Takes as input an array of floats. By convention, the first item is the value for comparison, the second item is the size of  		
-    	 * the input array or number of tuples, the  third the number of threads. The next 2*number of threads spaces are used by the 		
-    	 * generator. The following number of tuples items are the input, and the last number of tuples items are where the output will be stored. 
-    	 * In this way we pack both the input and the needed memory to be allocated. It is generated in the preceeding part of the code, 		
-    	 * which is defined in the dsl api ...**/
+    	 * Takes as input an array of floats. By convention, the first item is the value for comparison, 
+    	 * the second item is the size of the input array or number of tuples, the  third the number of threads. 
+    	 * The next 2*(number of threads) spaces are used by the generator. 
+    	 * The following number of tuples items are the input, and the last number of tuples items are where the 
+    	 * output will be stored. 
+    	 * In this way we pack both the input and the needed memory to be allocated. 
+    	 * 
+    	 * An array following this scheme is generated and initialized in the preceeding part of 
+    	 * the code, which is defined in the dsl api ...**/
 
       def snippet(input: Rep[Array[Float]]) = comment("Scan Variants", verbose = true) {
         
@@ -129,9 +132,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     	var initialOutputPos: this.Variable[Int]=0 //Definition of the initial output position, relative to number of hits.
 	  		
     	val zero: Rep[Int]=varIntToRepInt(initialOutputPos) //Definition of number 0, for typing purposes.
-    		
-    	var oneVar: this.Variable[Int]=1 //Definition of number 1, as variable, for typing purposes.
-      	        		
+    	  	        		
     	/*Definition of the AbstractLoop class, in charge of handling the application of the variants. */
     	abstract class AbstractLoop {
     	  
@@ -152,16 +153,21 @@ class ScanVariantsTests extends TutorialFunSuite {
     	  def numThreads: Rep[Int]  //Number of threads
     			
     	  def numInst: Int  //Number of instructions per iteration. 1 by default.
-    			
+    	      	   			
     	  /*Secondary attributes*/
     			
-    	  def displacementForIterationPos: Rep[Int] //Displacement for iteration position
+    	  def displacementForIterationPos: Rep[Int] /*Displacement for iteration position, 
+    	   											* Allowing to map between logical iteration number
+    	   											* and its position in the input array, following the
+    	   											* our scheme. */ 
     			
     	  /*Flags*/
     			
     	  def bfc: Boolean //Flag indicating if branch free code was selected
     			
     	  def parallel: Boolean //Flag indicating if parallelization has been selected
+    	  
+       	  def vectorized: Boolean //Flag indicating if vectorization has been selected
 
     	  /*FUNCTIONS*/
     	  /*Default constructor*/
@@ -207,7 +213,6 @@ class ScanVariantsTests extends TutorialFunSuite {
     		outputPos
     	  }
     			    			
-    	  
     	  /** runLoop: Outer function calling the execution of the loop (in this case, a simple loop)  
     	   *  Returns the number of hits found.*/
     	  def runLoop(): Var[Int] = {
@@ -236,11 +241,13 @@ class ScanVariantsTests extends TutorialFunSuite {
     		  
     	  override def numInst=1
     		  
-    	  override def numThreads=varIntToRepInt(oneVar)
+    	  override def numThreads=1
     		  
     	  override def bfc=false
     		  
     	  override def parallel=false
+    	  
+    	  override def vectorized=false
     			
     	}
     		
@@ -263,6 +270,8 @@ class ScanVariantsTests extends TutorialFunSuite {
     	  override def bfc=decoratedLoop.bfc
     			
     	  override def parallel=decoratedLoop.parallel
+    	  
+    	  override def vectorized=decoratedLoop.vectorized
     	  
     	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
     	    decoratedLoop.runInstructionOfIteration(it, dispIt)
@@ -452,6 +461,8 @@ class ScanVariantsTests extends TutorialFunSuite {
     	/*Class implementing vectorization*/
     	class VectorizedLoop (decoratedLoop: SimpleLoop, vectorSize: Int) extends LoopDecorator (decoratedLoop) {
     	  
+    	  override def vectorized=true
+    	  
     	  /*Note: Overriden functions at this point are still empty, and are just included as a working template.
     	   * Except for runLoop.*/
     	  override def runInstructionOfIteration(it: Rep[Int], dispIt:Rep[Int])= comment("decorated instruction", verbose = true){
@@ -463,12 +474,95 @@ class ScanVariantsTests extends TutorialFunSuite {
     	  }
     	  
     	  override def innerRunLoop(numIn:Int, numItU:Rep[Int], iteration:(Rep[Int],(Rep[Int],Rep[Int])=>Unit)=>Unit, instOfIt:(Rep[Int],Rep[Int])=>Unit, isbfc:Boolean): Var[Int] = {
-    	    decoratedLoop.innerRunLoop(numIn, numItU, runIteration, runInstructionOfIteration, isbfc)
+    	    for (i <- (0 until maxNumIt): Rep[Range]) {
+    		  iteration(i, instOfIt)
+    		}
+    	    outputPos
     	  }
     			
-    	  override def runLoop(): Var[Int]={
+    	  override def runLoop(): Var[Int]= {
     	    
-    	    //ALIGNMENT
+    	    if (decoratedLoop.vectorized){ //Do nothing
+    	      innerRunLoop(numInst, numIterationsUnrolled, runIteration, runInstructionOfIteration, bfc)
+    	    }
+    	    else {
+    	      val sizeoffloat:Rep[Int]=sizeof("float")
+    	      val sizeofm128:Rep[Int]=sizeof("__m128")
+    	      var sse_array: Rep[Array[Float]]=(referenceOperator(input(displacementForIterationPos))).asInstanceOf[Rep[Array[Float]]]
+    	      var alignment_offset: Rep[Int]=sizeofm128-((intptr_t(sse_array))%sizeofm128)
+    	      var basetid: Rep[Int]= (alignment_offset/sizeoffloat) //Add result_tid_offset for threads
+    	      var sse_array_length: Rep[Int]= (maxNumIt-basetid)*sizeoffloat/sizeofm128
+    	      var tmp_array: Rep[Array[Char]]= sse_array.asInstanceOf[Rep[Array[Char]]]
+    	      sse_array=tmp_array.asInstanceOf[Rep[Array[Int]]]
+    	      if (alignment_offset!=0){
+    	    	  for (i<-(0 until basetid): Rep[Range]){
+    	    	    runInstructionOfIteration(i, displacementForIterationPos)
+    	    	  }
+    	      }
+    	      var basetidToWrite: Var[Int]= 0 +basetid
+    	      var comp_val: Rep[Int]= _mm_set1_ps(value)
+     	      var read_val: Rep[Int]= _mm_set1_ps(zero.asInstanceOf[Rep[Float]])
+      	      var comp_result: Rep[Int]= _mm_set1_ps(zero.asInstanceOf[Rep[Float]])
+      	      val displacementVal: Rep[Int]= displacementForIterationPos+maxNumIt
+      	      for (i<- (0 until sse_array_length): Rep[Range]){
+      	        read_val=_mm_load_ps(referenceOperator(sse_array(i).asInstanceOf[Rep[Float]]).asInstanceOf[Rep[Array[Float]]])
+      	        comp_result={
+      	          predicate match {
+      	            case "EQUAL" => _mm_cmpeq_ps(read_val, comp_val)
+      	            case "GREATER" => _mm_cmpgt_ps(read_val, comp_val)
+    	            case "GREATER_EQUAL" => _mm_cmpge_ps(read_val, comp_val) 
+    	            case "LESSER" =>  _mm_cmplt_ps(read_val, comp_val)
+    	            case "LESSER_EQUAL" => _mm_cmple_ps(read_val, comp_val)
+    	            case "NOT_EQUAL" =>  _mm_cmpneq_ps(read_val, comp_val) 
+    	            case _ => _mm_cmpeq_ps(read_val,read_val) //Always true, not by operator but by parameters
+    		      }
+      	        }
+    		    var mask: Rep[Int]= _mm_movemask_ps(comp_result)
+    		    if(bfc){
+    		      input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		      basetidToWrite+=1
+    		      outputPos+=(bitwiseCompare(mask,1)) 
+    		      input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		      basetidToWrite+=1
+    		      outputPos+=(bitwiseCompare(binaryRightShift(mask,1), 1))
+    		      input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		      basetidToWrite+=1
+    		      outputPos+=(bitwiseCompare(binaryRightShift(mask,2), 1)) 
+    		      input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		      basetidToWrite+=1
+    		      outputPos+=(bitwiseCompare(binaryRightShift(mask,3), 1)) 
+    		    }
+    		    else{
+    		      if((bitwiseCompare(mask,1)).asInstanceOf[Rep[Boolean]]){
+    		        input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		        outputPos+=1
+    		      }
+    		      basetidToWrite+=1
+    		      if((bitwiseCompare(binaryRightShift(mask,1), 1)).asInstanceOf[Rep[Boolean]]){
+    		        input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		        outputPos+=1    		        
+    		      }
+    		      basetidToWrite+=1
+    		      if((bitwiseCompare(binaryRightShift(mask,2), 1)).asInstanceOf[Rep[Boolean]]){
+    		        input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		        outputPos+=1
+    		      }
+    		      basetidToWrite+=1
+    		      if((bitwiseCompare(binaryRightShift(mask,3), 1)).asInstanceOf[Rep[Boolean]]){
+      		        input(varIntToRepInt(outputPos)+displacementVal)=varIntToRepInt(basetidToWrite).asInstanceOf[Rep[Float]]
+    		        outputPos+=1
+    		      }
+    		      basetidToWrite+=1
+    		    }
+            }
+    	    
+    	    for(i <-((sse_array_length*sizeofm128/sizeoffloat)+basetid until maxNumIt): Rep[Range]){ 
+              runInstructionOfIteration(i, displacementForIterationPos)
+            }
+
+    	    outputPos
+    	    
+    	    //Notes for combining vectorization with other variants: ALIGNMENT
     		/* My guess is that the alignment will be processed here, always. For this I can define a butFirst function, 
     		 * which would take the first part of the iteration, if needed. Other loop will simply decorate this, except here.
     		 * If done, start position must be checked for all the others...
@@ -488,9 +582,9 @@ class ScanVariantsTests extends TutorialFunSuite {
     	    /*Another function will have to be used for this, again this will be a function called atLast, handling only the residual
     	     *iterations of this. This would require changing all other functions, to handle the new upper bound.
     	     *The comparison inside can be supported for both cases, with or without branches.*/
-    		    
-    		 innerRunLoop(decoratedLoop.numInst, decoratedLoop.numIterationsUnrolled, runIteration, runInstructionOfIteration, decoratedLoop.bfc)
-    	  }  	
+    		        	        	    
+    	    }  	
+    	  }
     		  
     	}
     		
@@ -525,7 +619,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     	
     	/*Variables for configuration (apart from instructions array)*/
     	val unrollDepthRequested:Int=4
-    	val vectorSizeRequested:Int=4
+    	val vectorSizeRequested:Int=4 //Only 4 is supported in this version.
 
     	/*Application of variants to the generic loop.*/
     	for (instruction<-instructions){	  
@@ -545,9 +639,10 @@ class ScanVariantsTests extends TutorialFunSuite {
     	var outputPos: Rep[Int]=varIntToRepInt(loop.runLoop()) 
 		    
     	/*Printing of the output array*/
+    	
     	println("Number of tuples found: ")	
     	println(outputPos)
-    		
+    	
     	if(outputPos!=zero){
     		println("Output array: ")
     		var baseValue:Rep[Int]= loop.displacementForIterationPos+loop.numIterations
@@ -555,7 +650,7 @@ class ScanVariantsTests extends TutorialFunSuite {
     			println(input(i+baseValue))
     		}
     	}
-    		
+    			
       }//End of snippet function
       
       /*End of area where context is shared between 2 stages*/
@@ -571,12 +666,61 @@ class ScanVariantsTests extends TutorialFunSuite {
     In future versions, this section could be removed altogether.
     ***********************************************************************************************************/
     
-    /*Post-processing of the generated file so as to include the Parallelization*/
+    /*Post-processing of the generated file so as to include Parallelization and Vectorization*/
     var fileLines = io.Source.fromFile("src/out/c_code_generation_tests_ScanVariants_"+predicateAssigned+".check.c").getLines.toList
     
-    /**We check if the code was parallelized, by seeing if it has as input the number of threads and if it has loops that
-     * use this number as limit for the iteration space (this is a characteristic exclusive to code that uses parallelization)*/
-    if(fileLines.filter(x=>x.contains("x0[2]")).length>0){ 
+    if (instructions.contains("Vectorize")){
+      if(fileLines.filter(x=>x.contains("&(")).length>0){ 
+        var displacementLine= fileLines.filter(x=>x.contains("&(")).head
+        var displacementLineSplit = displacementLine.split("&")
+        var firstVariableName=displacementLineSplit(1).replace("(", "").replace(")", "").replace(";","")
+        var substitutionLine=fileLines.filter(x=>x.contains(firstVariableName+" = ")).head
+        var substitutionLineSplitted=substitutionLine.split("=")
+        var substitutionString=substitutionLineSplitted(1).replace(";", "").replace(" ", "")
+        var sseArrayLine = fileLines.filter(x=>x.contains("&(")).tail.head
+        var sseArrayLineSplitted = sseArrayLine.split("&")
+        var secondVariableName=sseArrayLineSplitted(1).replace("(", "").replace(")", "").replace(";","")
+        var substitutionLine2=fileLines.filter(x=>x.contains(secondVariableName+" = ")).head
+        var substitutionLine2Splitted= substitutionLine2.split("=")
+        var substitutionString2=substitutionLine2Splitted(1).replace(";", "").replace(" ", "")
+        fileLines=fileLines diff List(substitutionLine)
+        fileLines=fileLines diff List(substitutionLine2)
+        fileLines=fileLines.updated(fileLines.indexOf(displacementLine), displacementLine.replace(firstVariableName, substitutionString).replace("float*", "__m128*").replace("=", "= (__m128*)"))
+        fileLines=fileLines.updated(fileLines.indexOf(sseArrayLine), sseArrayLine.replace(secondVariableName, substitutionString2).replace("=", "= (float*)"))
+        displacementLineSplit= displacementLine.split("=")
+        var arrayVariable= displacementLineSplit(0).replace("float*", "").replace(" ", "")
+        def insert[A](xs: List[A], extra: List[A])(p: A => Boolean) = {
+        	xs.map(x => if (p(x)) extra ::: List(x) else List(x)).flatten
+        }
+        var moduloVariableSplitted=fileLines.filter(x=>x.contains("%")).head.replace(" ","").replace("int32_t", "").split("=")
+        var moduloVariable=moduloVariableSplitted(0)
+        var alignmentOffsetVariableSplitted=fileLines.filter(x=>x.contains("- "+moduloVariable+";")).head.replace("int32_t", "").split("=")
+        var alignmentOffsetVariable=alignmentOffsetVariableSplitted(0).replace(" ","")
+        fileLines=insert(fileLines,List("  char* tmp_array= (char*) "+arrayVariable+";","  tmp_array+="+alignmentOffsetVariable+";", "  "+arrayVariable+"=(__m128*)(tmp_array);")){_ == fileLines.filter(x=>x.contains(alignmentOffsetVariable+" == 0;")).head}
+        var mmsetFileLines= Vector(fileLines.filter(x=>x.contains("_mm_")):_*)
+        for (mmsetFileLine <-mmsetFileLines){
+          if (mmsetFileLine.contains("_mm_movemask_ps")){
+            var altString=mmsetFileLine.replace("_mm_movemask_ps(","_mm_movemask_ps((__m128)")
+            fileLines=fileLines.updated(fileLines.indexOf(mmsetFileLine), altString)
+          }
+          else{
+            var altString=mmsetFileLine.replace("int32_t","__m128")
+            fileLines=fileLines.updated(fileLines.indexOf(mmsetFileLine), altString)
+          }
+        }  
+        /*We write back to the file*/	
+	    val pw = new PrintWriter(new File("src/out/c_code_generation_tests_ScanVariants_"+predicateAssigned+".check.c"))
+	    for (str<- fileLines){
+	    	pw.write(str+"\n")
+	    }
+	    pw.close()
+      }
+    }
+     
+     /**We check if the code was parallelized, by seeing if it has as input the number of threads and if it has loops that
+     * use this number as limit for the iteration space (this is a characteristic exclusive to code that uses parallelization).
+     * Optionally the instructions array could also be used. */
+    if(instructions.contains("Parallelize") && fileLines.filter(x=>x.contains("x0[2]")).length>0){ 
     	val numThreadsLine=fileLines.filter(x=>x.contains("x0[2]")).head
     	var arrayOfSplitting: Array[java.lang.String] = numThreadsLine.split(" ")
    	   	val numThreadsIdentifier=arrayOfSplitting(3)

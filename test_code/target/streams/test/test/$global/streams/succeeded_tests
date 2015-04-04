@@ -1,8 +1,3 @@
 #Successful Tests
-#Fri Mar 20 20:03:57 CET 2015
-scala.lms.scan_variants.ScanVariantsTests=1426878237130
-scala.lms.tutorial.GettingStartedTest=1422481312722
-scala.lms.tutorial.DynVarWarmupTest=1422433374645
-scala.lms.tutorial.ScannerLibTest=1422481307704
-scala.lms.scan_variants.ScanVariantTests=1422736368808
-scala.lms.tutorial.ScanVariantTests=1422482017265
+#Sat Apr 04 03:33:43 CEST 2015
+scala.lms.scan_variants.ScanVariantsTests=1428111223208
