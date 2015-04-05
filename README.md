@@ -1,6 +1,6 @@
 # TestsForScanVariantsWithLMS
 
-In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (https://github.com/scala-lms/tutorials/blob/master/src/test/scala/lms/tutorial/dslapi.scala, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. We are specifically studying how code generation could be carried out for loop unrolling, branch free code, vectorization (using the X86 instructions), parallelization (using phthreads) and their combinations. GPU parallelization has been added, but without support for combining it with other variants.
+In these tests we use Light-weight modular staging (LMS) (http://scala-lms.github.io/) and their version of a DSL api (https://github.com/scala-lms/tutorials/blob/master/src/test/scala/lms/tutorial/dslapi.scala, with some minor modifications of our own), to generate C code for different optimizations of the Scan operation. We are specifically studying how code generation could be carried out for loop unrolling, branch free code, vectorization (using SSE instructions), parallelization (using phthreads) and their combinations. GPU parallelization has been added, but without support for combining it with other variants.
 
 GPU parallelization is still not included in this release.
 
