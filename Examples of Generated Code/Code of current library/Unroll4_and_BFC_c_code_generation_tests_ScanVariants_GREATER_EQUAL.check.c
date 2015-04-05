@@ -55,111 +55,91 @@ Emitting C Generated Code
 #include <string.h>
 #include <stdbool.h>
 void Scan(float*  x0) {
-  float x4 = x0[1];
-  float x5 = x4 / 4.0f;
-  float x3 = x0[0];
-  int32_t x64 = x5 * 4;
-  bool x65 = x64 < x4;
+  float x3 = x0[1];
+  float x4 = x3 / 4.0f;
+  float x2 = x0[0];
+  int32_t x55 = x4 * 4;
   //#Scan Variants
   // generated code for Scan Variants
   int32_t x1 = 0;
-  int32_t x2 = 1;
-  for(int x7=0; x7 < x5; x7++) {
-    int32_t x8 = x7 * 4;
-    int32_t x9 = x8 + 3;
-    float x14 = x0[x9];
-    bool x15 = x14 >= x3;
-    int32_t x21 = 1 + x8;
-    int32_t x22 = x21 + 3;
-    float x27 = x0[x22];
-    bool x28 = x27 >= x3;
-    int32_t x34 = 2 + x8;
-    int32_t x35 = x34 + 3;
-    float x40 = x0[x35];
-    bool x41 = x40 >= x3;
-    int32_t x47 = 3 + x8;
-    int32_t x48 = x47 + 3;
-    float x53 = x0[x48];
-    bool x54 = x53 >= x3;
+  for(int x6=0; x6 < x4; x6++) {
+    int32_t x7 = x6 * 4;
+    int32_t x8 = x7 + 3;
+    float x13 = x0[x8];
+    bool x14 = x13 >= x2;
+    int32_t x18 = 1 + x7;
+    int32_t x19 = x18 + 3;
+    float x24 = x0[x19];
+    bool x25 = x24 >= x2;
+    int32_t x29 = 2 + x7;
+    int32_t x30 = x29 + 3;
+    float x35 = x0[x30];
+    bool x36 = x35 >= x2;
+    int32_t x40 = 3 + x7;
+    int32_t x41 = x40 + 3;
+    float x46 = x0[x41];
+    bool x47 = x46 >= x2;
     //#run iteration from unrolled loop
     // generated code for run iteration from unrolled loop
-    //#decorated instruction
-    // generated code for decorated instruction
     //#run instruction without branching
     // generated code for run instruction without branching
-    int32_t x10 = x1;
-    int32_t x11 = x10 + 3;
-    int32_t x12 = x11 + x4;
-    x0[x12] = x8;
-    x1 += x15;
+    int32_t x9 = x1;
+    int32_t x10 = x9 + 3;
+    int32_t x11 = x10 + x3;
+    x0[x11] = x7;
+    x1 += x14;
     //#run instruction without branching
-    //#decorated instruction
-    //#decorated instruction
-    // generated code for decorated instruction
     //#run instruction without branching
     // generated code for run instruction without branching
-    int32_t x23 = x1;
-    int32_t x24 = x23 + 3;
-    int32_t x25 = x24 + x4;
-    x0[x25] = x21;
-    x1 += x28;
+    int32_t x20 = x1;
+    int32_t x21 = x20 + 3;
+    int32_t x22 = x21 + x3;
+    x0[x22] = x18;
+    x1 += x25;
     //#run instruction without branching
-    //#decorated instruction
-    //#decorated instruction
-    // generated code for decorated instruction
     //#run instruction without branching
     // generated code for run instruction without branching
-    int32_t x36 = x1;
-    int32_t x37 = x36 + 3;
-    int32_t x38 = x37 + x4;
-    x0[x38] = x34;
-    x1 += x41;
+    int32_t x31 = x1;
+    int32_t x32 = x31 + 3;
+    int32_t x33 = x32 + x3;
+    x0[x33] = x29;
+    x1 += x36;
     //#run instruction without branching
-    //#decorated instruction
-    //#decorated instruction
-    // generated code for decorated instruction
     //#run instruction without branching
     // generated code for run instruction without branching
-    int32_t x49 = x1;
-    int32_t x50 = x49 + 3;
-    int32_t x51 = x50 + x4;
-    x0[x51] = x47;
-    x1 += x54;
+    int32_t x42 = x1;
+    int32_t x43 = x42 + 3;
+    int32_t x44 = x43 + x3;
+    x0[x44] = x40;
+    x1 += x47;
     //#run instruction without branching
-    //#decorated instruction
     //#run iteration from unrolled loop
   }
-  if (x65) {
-    for(int x67=x64; x67 < x4; x67++) {
-      int32_t x68 = x67 + 3;
-      float x73 = x0[x68];
-      bool x74 = x73 >= x3;
-      //#decorated instruction
-      // generated code for decorated instruction
-      //#run instruction without branching
-      // generated code for run instruction without branching
-      int32_t x69 = x1;
-      int32_t x70 = x69 + 3;
-      int32_t x71 = x70 + x4;
-      x0[x71] = x67;
-      x1 += x74;
-      //#run instruction without branching
-      //#decorated instruction
-    }
-  } else {
+  for(int x57=x55; x57 < x3; x57++) {
+    int32_t x58 = x57 + 3;
+    float x63 = x0[x58];
+    bool x64 = x63 >= x2;
+    //#run instruction without branching
+    // generated code for run instruction without branching
+    int32_t x59 = x1;
+    int32_t x60 = x59 + 3;
+    int32_t x61 = x60 + x3;
+    x0[x61] = x57;
+    x1 += x64;
+    //#run instruction without branching
   }
-  int32_t x84 = x1;
+  int32_t x70 = x1;
   printf("%s\n","Number of tuples found: ");
-  printf("%d\n",x84);
-  bool x88 = x84 == 0;
-  if (x88) {
+  printf("%d\n",x70);
+  bool x74 = x70 == 0;
+  if (x74) {
   } else {
     printf("%s\n","Output array: ");
-    int32_t x90 = 3 + x4;
-    for(int x92=0; x92 < x84; x92++) {
-      int32_t x93 = x92 + x90;
-      float x94 = x0[x93];
-      printf("%f\n",x94);
+    int32_t x76 = 3 + x3;
+    for(int x78=0; x78 < x70; x78++) {
+      int32_t x79 = x78 + x76;
+      float x80 = x0[x79];
+      printf("%f\n",x80);
     }
   }
   //#Scan Variants
