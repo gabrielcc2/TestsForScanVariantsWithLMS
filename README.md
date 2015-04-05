@@ -53,6 +53,7 @@ Optional work for deployment:
 - ...
 
 Ideas for Future Work:
+- Extend the vectorization so it supports other vector sizes (our release only supports a vector of size 4).
 - Consider alternatives for generating the parallel code, such as using the Delite framework (http://stanford-ppl.github.io/Delite/).
 - Test for other operators.
 
